@@ -1334,8 +1334,10 @@ img {
   }
 }
 
-@media (max-width: 768px) {
-  --header-height: 70px;
+@media (max-width: 991px) {
+  :root {
+    --header-height: 70px;
+  }
   
   .desktop-nav {
     display: none;
