@@ -17,7 +17,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   
   <!-- CSS Stylesheet -->
-  <link rel="stylesheet" href="style.css?v=1.1">
+  <link rel="stylesheet" href="style.css?v=1.2">
 </head>
 <body>
 
@@ -294,42 +294,138 @@
     </div>
   </section>
 
-  <!-- Upcoming Events Section -->
+  <!-- Events Section -->
   <section class="events-section id-anchor" id="events">
     <div class="container">
       <div class="section-header text-center">
-        <h2 class="section-title">Upcoming Event</h2>
-        <p class="section-subtitle">JOIN US!</p>
+        <div class="badge">Live & Unforgettable</div>
+        <h2 class="section-title">Upcoming <span class="gradient-text">Events</span></h2>
+        <p class="section-subtitle">Join us for extraordinary performances, live concerts, and vibrant celebrations</p>
       </div>
 
-      <div class="events-grid" style="display: flex; justify-content: center;">
-        <!-- Event: Tun Fun Nights -->
-        <div class="event-card glass-card" style="max-width: 480px; width: 100%;">
-          <div class="event-image-wrapper">
-            <img src="assets/tun_fun_nights.jpg" alt="Tun Fun Nights Poster" class="event-image">
+      <!-- Events Filter Tabs -->
+      <div class="events-filter-wrapper">
+        <div class="events-filter">
+          <button class="filter-btn active" data-filter="all">All Events</button>
+          <button class="filter-btn" data-filter="upcoming">Upcoming Events (2)</button>
+          <button class="filter-btn" data-filter="past">Past Events (1)</button>
+        </div>
+      </div>
+
+      <!-- Upcoming Events Grid -->
+      <div class="events-grid upcoming-grid">
+
+        <!-- Event 1: Anarkali Marikar Live Music Show -->
+        <div class="event-card glass-card" data-category="upcoming">
+          <div class="event-image-wrapper open-event-modal" data-event-id="anarkali_marikar" title="Click to view full poster & book">
+            <img src="assets/anarkali_marikar_live.jpg" alt="Anarkali Marikar Live Music Show in Maidstone Poster" class="event-image">
             <div class="event-date-badge">
-              <span class="day">25</span>
-              <span class="month">JUL</span>
+              <span class="day">03</span>
+              <span class="month">JAN</span>
+              <span class="year">2027</span>
             </div>
+            <div class="event-status-pill upcoming-pill">🎉 New Year 2027</div>
           </div>
           <div class="event-info">
             <div class="event-meta">
-              <span class="event-time">⏰ 08:00 PM</span>
-              <span class="event-location">📍 Aura Bar & Club</span>
+              <span class="event-time">⏰ 5:00 PM – 10:00 PM</span>
+              <span class="event-location">📍 Maidstone Leisure Centre</span>
             </div>
-            <h3 class="event-title">Tun Fun Nights</h3>
+            <h3 class="event-title">Anarkali Marikar Live Music Show</h3>
+            <div class="event-tagline-text">Let's Celebrate New Year Together • In Maidstone</div>
             <p class="event-desc">
-              The ultimate multilingual DJ night. Live, loud, and unlimited fun! Experience amazing beats, non-stop entertainment, and the best party vibes with DJ Julix.
+              Celebrate the New Year with a spectacular live music performance by Anarkali Marikar and band! Featuring a Live DJ, authentic food stalls, live henna artists, live caricatures, and a 360° photobooth for a night to remember.
             </p>
             <div class="event-artist-row">
-              <div class="artist-badge">DJ JULIX</div>
+              <span class="artist-badge">🎧 Live DJ</span>
+              <span class="artist-badge">🍛 Food Stall</span>
+              <span class="artist-badge">🎨 Henna Artist</span>
+              <span class="artist-badge">✍️ Caricature</span>
+              <span class="artist-badge">📸 360° Booth</span>
             </div>
             <div class="event-actions">
-              <a href="tel:+447388890443" class="btn btn-primary btn-sm btn-block">Call Contact 📞</a>
+              <button class="btn btn-primary btn-sm open-event-modal" data-event-id="anarkali_marikar">View Details & Book 🎟️</button>
+              <a href="tel:+447388890443" class="btn btn-outline btn-sm">Call Contact 📞</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Event 2: Sooraj Santhosh Live UK & Ireland Tour -->
+        <div class="event-card glass-card" data-category="upcoming">
+          <div class="event-image-wrapper open-event-modal" data-event-id="sooraj_santhosh" title="Click to view tour details & register">
+            <img src="assets/sooraj_santhosh_tour.jpg" alt="Sooraj Santhosh Live UK & Ireland Tour Poster" class="event-image">
+            <div class="event-date-badge">
+              <span class="day">MAY</span>
+              <span class="month">TOUR</span>
+              <span class="year">2027</span>
+            </div>
+            <div class="event-status-pill tour-pill">⚡ UK & Ireland Tour</div>
+          </div>
+          <div class="event-info">
+            <div class="event-meta">
+              <span class="event-time">🗓️ May 2027</span>
+              <span class="event-location">📍 UK & Ireland Tour</span>
+            </div>
+            <h3 class="event-title">Sooraj Santhosh Live</h3>
+            <div class="event-tagline-text">One Voice, A Thousand Emotions • Stay Tuned</div>
+            <p class="event-desc">
+              Little Crew presents Sooraj Santhosh Live on his landmark tour across the UK and Ireland, powered by Joanna Holidays. Experience an electrifying evening of soulful music and powerhouse vocals. Stay tuned for city and venue schedules!
+            </p>
+            <div class="event-artist-row">
+              <span class="artist-badge">Little Crew Presents</span>
+              <span class="artist-badge">Powered by Joanna Holidays</span>
+              <span class="artist-badge">UK & Ireland Tour</span>
+            </div>
+            <div class="event-actions">
+              <button class="btn btn-primary btn-sm open-event-modal" data-event-id="sooraj_santhosh">Tour Updates 🔔</button>
+              <a href="tel:+447388890443" class="btn btn-outline btn-sm">Call Contact 📞</a>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Past Events Sub-section -->
+      <div class="past-events-section" id="pastEventsBlock">
+        <div class="section-header text-center" style="margin-bottom: 2.5rem;">
+          <h3 class="past-events-heading">Past <span class="gradient-text">Events</span></h3>
+          <p class="section-subtitle">Moments and memories from our celebrated gatherings</p>
+        </div>
+
+        <div class="events-grid past-grid" style="display: flex; justify-content: center;">
+          <!-- Event: Tun Fun Nights (Past Event) -->
+          <div class="event-card glass-card past-event-card" data-category="past" style="max-width: 520px; width: 100%;">
+            <div class="event-image-wrapper open-event-modal" data-event-id="tun_fun" title="Click to view recap">
+              <img src="assets/tun_fun_nights.jpg" alt="Tun Fun Nights Poster" class="event-image past-event-image">
+              <div class="event-date-badge past-date">
+                <span class="day">25</span>
+                <span class="month">JUL</span>
+                <span class="year">2026</span>
+              </div>
+              <div class="event-status-pill past-pill">✓ Concluded</div>
+            </div>
+            <div class="event-info">
+              <div class="event-meta">
+                <span class="event-time">⏰ 08:00 PM</span>
+                <span class="event-location">📍 Aura Bar & Club, Tunbridge Wells</span>
+              </div>
+              <h3 class="event-title">Tun Fun Nights</h3>
+              <div class="event-tagline-text" style="color: var(--text-muted);">The Ultimate Multilingual DJ Night • Concluded</div>
+              <p class="event-desc">
+                The ultimate multilingual DJ night. Live, loud, and unlimited fun! Held at Aura Bar & Club featuring amazing beats, non-stop entertainment, and peak party vibes with DJ Julix.
+              </p>
+              <div class="event-artist-row">
+                <span class="artist-badge">DJ JULIX</span>
+                <span class="artist-badge past-badge-tag">Successfully Completed</span>
+              </div>
+              <div class="event-actions">
+                <button class="btn btn-outline btn-sm btn-block open-event-modal" data-event-id="tun_fun">View Event Highlights 📸</button>
+              </div>
             </div>
           </div>
         </div>
       </div>
+
     </div>
   </section>
 
@@ -441,6 +537,6 @@
   </div>
 
   <!-- Script File -->
-  <script src="app.js?v=1.1"></script>
+  <script src="app.js?v=1.2"></script>
 </body>
 </html>

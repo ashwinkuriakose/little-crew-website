@@ -139,6 +139,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // ==========================================
   const filterBtns = document.querySelectorAll('.filter-btn');
   const eventCards = document.querySelectorAll('.event-card');
+  const pastEventsBlock = document.getElementById('pastEventsBlock');
 
   filterBtns.forEach(btn => {
     btn.addEventListener('click', () => {
@@ -161,6 +162,15 @@ document.addEventListener('DOMContentLoaded', () => {
           card.style.display = 'none';
         }
       });
+
+      // Show or hide the Past Events sub-section block
+      if (pastEventsBlock) {
+        if (filterValue === 'upcoming') {
+          pastEventsBlock.style.display = 'none';
+        } else {
+          pastEventsBlock.style.display = 'block';
+        }
+      }
     });
   });
 
@@ -173,6 +183,33 @@ document.addEventListener('DOMContentLoaded', () => {
   const openModalButtons = document.querySelectorAll('.open-event-modal');
 
   const eventsData = {
+    anarkali_marikar: {
+      title: 'Anarkali Marikar Live Music Show in Maidstone',
+      image: 'assets/anarkali_marikar_live.jpg',
+      time: 'Sunday, January 3rd, 2027 • 5:00 PM – 10:00 PM',
+      location: 'Maidstone Leisure Centre, Maidstone',
+      artist: 'Anarkali Marikar & Live Band',
+      description: "Let's Celebrate New Year Together! Join us for a vibrant, high-energy live music concert featuring the sensational Anarkali Marikar in Maidstone. Featuring a Live DJ, authentic food stalls, live henna artists, live caricatures, and a 360° photobooth. Music • Culture • Food • Fun — A night to remember. Welcome everyone!",
+      ctaText: 'Book Tickets / Inquire Now'
+    },
+    sooraj_santhosh: {
+      title: 'Sooraj Santhosh Live — UK & Ireland Tour',
+      image: 'assets/sooraj_santhosh_tour.jpg',
+      time: 'May 2027 • UK & Ireland Tour',
+      location: 'UK & Ireland Venues (Announcing Soon)',
+      artist: 'Sooraj Santhosh',
+      description: 'One Voice, A Thousand Emotions. Little Crew Presents Sooraj Santhosh Live on his landmark tour across the UK and Ireland, powered by Joanna Holidays. Experience an electrifying evening of soulful melodies and powerhouse vocals. Stay tuned for city and venue schedules! Contact us at 073 88 390 443 for tour info and sponsorships.',
+      ctaText: 'Register for Tour Info'
+    },
+    tun_fun: {
+      title: 'Tun Fun Nights (Past Event)',
+      image: 'assets/tun_fun_nights.jpg',
+      time: 'Saturday, July 25th, 2026 • 8:00 PM onwards',
+      location: 'Aura Bar & Club, 46-50 High St, Tunbridge Wells, TN1 1XF',
+      artist: 'DJ Julix',
+      description: 'The ultimate multilingual DJ night. Live, loud, and unlimited fun! Experience amazing beats, non-stop entertainment, and the best party vibes with DJ Julix. This event has concluded. Contact us for private bookings and future party series!',
+      ctaText: 'Inquire for Future Events'
+    },
     night_club: {
       title: 'Night Club Party',
       image: 'assets/night_club_party.png',
@@ -181,24 +218,6 @@ document.addEventListener('DOMContentLoaded', () => {
       artist: 'DJ Julia',
       description: 'Step into the night with high-energy tracks, custom visual effects, and a spectacular smoke and light show. Bring your crew for a premium clubbing event.',
       ctaText: 'Reserve Club Pass'
-    },
-    tun_fun: {
-      title: 'Tun Fun Nights',
-      image: 'assets/tun_fun_nights.jpg',
-      time: 'Saturday, July 25th, 2026 - 8:00 PM onwards',
-      location: 'Aura Bar & Club, 46-50 High St, Tunbridge Wells, TN1 1XF',
-      artist: 'DJ Julix',
-      description: 'The ultimate multilingual DJ night. Live, loud, and unlimited fun! Experience amazing beats, non-stop entertainment, and the best party vibes with DJ Julix.',
-      ctaText: 'Get VIP Entry Ticket'
-    },
-    julix_showcase: {
-      title: 'DJ Julix - Official Artist Profile',
-      image: 'assets/tun_fun_nights.png', // Fallback banner
-      time: 'Featured Partnership Showcase',
-      location: 'Little Crew Co. Creative Platform',
-      artist: 'DJ Julix',
-      description: 'DJ Julix is a pioneer in combining electronic styles with retro beats. We work closely to design custom events, audio-visual layouts, and high-impact branding.',
-      ctaText: 'Inquire for Bookings'
     }
   };
 
