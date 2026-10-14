@@ -273,10 +273,10 @@ document.addEventListener('DOMContentLoaded', () => {
       if (response.success) {
         modalContent.innerHTML = `
           <div style="text-align: center; padding: 3rem 1.5rem;">
-            <div style="font-size: 3rem; margin-bottom: 1.5rem;">🎟️</div>
-            <h3 class="modal-title" style="margin-bottom: 1rem;">Booking Confirmed!</h3>
+            <div style="font-size: 3rem; margin-bottom: 1.5rem;">✨</div>
+            <h3 class="modal-title" style="margin-bottom: 1rem;">Our Team Will Get Back to You!</h3>
             <p class="modal-description" style="margin-bottom: 2rem;">
-              Thank you, <strong>${name}</strong>. We have registered your request for the event. We will contact you at <strong>${email}</strong> with details shortly.
+              Thank you, <strong>${name}</strong>! We have received your inquiry for <strong>${data.title}</strong>. Our team will get in touch with you at <strong>${email}</strong> shortly with all the details.
             </p>
             ${response.isDemo ? `
               <div style="margin: -1rem auto 2rem auto; padding: 0.75rem; border-radius: 8px; background: rgba(168,85,247,0.15); border: 1px dashed #a855f7; max-width: 400px; font-size: 0.85rem; color: #d8b4fe; line-height: 1.4;">
