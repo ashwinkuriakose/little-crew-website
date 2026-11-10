@@ -184,13 +184,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const eventsData = {
     anarkali_marikar: {
-      title: 'Anarkali Marikar Live Music Show in Maidstone',
+      title: 'Anarkali Marikar Remix — New Year Party',
       image: 'assets/anarkali_marikar_live.jpg',
-      time: 'Sunday, January 3rd, 2027 • 5:00 PM – 10:00 PM',
-      location: 'Maidstone Leisure Centre, Maidstone',
+      time: 'Sunday, January 3rd, 2027 • Gate Opens: 5:00 PM',
+      location: 'Maidstone Leisure Centre, ME15 7RN',
       artist: 'Anarkali Marikar & Live Band',
-      description: "Let's Celebrate New Year Together! Join us for a vibrant, high-energy live music concert featuring the sensational Anarkali Marikar in Maidstone. Featuring a Live DJ, authentic food stalls, live henna artists, live caricatures, and a 360° photobooth. Music • Culture • Food • Fun — A night to remember. Welcome everyone!",
-      ctaText: 'Book Tickets / Inquire Now'
+      description: "Little Crew presents Anarkali Marikar Remix - New Year Party! Celebrate New Year 2027 with a high-energy live music performance by Anarkali Marikar and band. Featuring a Live DJ, authentic food stalls, live henna artists, live caricatures, and a 360° photobooth for a night to remember at Maidstone Leisure Centre. Powered by Joanna Holidays, Ample Mortgages, Nava Ruchi, and IMAD Photography. Book your tickets now on CrowdPass!",
+      ctaText: 'Book Tickets on CrowdPass 🎟️',
+      bookingUrl: 'https://littlecrew.crowdpass.co.uk/'
     },
     sooraj_santhosh: {
       title: 'Sooraj Santhosh Live — UK & Ireland Tour',
@@ -200,6 +201,15 @@ document.addEventListener('DOMContentLoaded', () => {
       artist: 'Sooraj Santhosh',
       description: 'One Voice, A Thousand Emotions. Little Crew Presents Sooraj Santhosh Live on his landmark tour across the UK and Ireland, powered by Joanna Holidays. Experience an electrifying evening of soulful melodies and powerhouse vocals. Stay tuned for city and venue schedules! Contact us at 073 88 390 443 for tour info and sponsorships.',
       ctaText: 'Register for Tour Info'
+    },
+    anju_joseph: {
+      title: 'Anju Joseph Live — UK & Europe Tour',
+      image: 'assets/anju_joseph_tour.jpg',
+      time: 'May – June 2027 • UK & Europe Tour',
+      location: 'UK & Europe Venues (Announcing Soon)',
+      artist: 'Anju Joseph, Feat. Sreenath Sivasankaran & Mahesh Kunjumon',
+      description: 'A Complete Entertainment Show! Little Crew and V4 Entertainments present Anju Joseph Live on an electrifying UK & Europe tour across May – June 2027. Featuring dynamic musical performances with Sreenath Sivasankaran and sensational comedy & mimicry by Mahesh Kunjumon. Contact us for tour bookings and sponsorships at +44 7388 390443 or +44 7878 8896384.',
+      ctaText: 'Inquire for Tour Info'
     },
     tun_fun: {
       title: 'Tun Fun Nights (Past Event)',
@@ -235,14 +245,22 @@ document.addEventListener('DOMContentLoaded', () => {
       </div>
       <p class="modal-description">${data.description}</p>
       
-      <form class="modal-booking-form" id="modalBookingForm">
-        <h4 style="margin-bottom: 0.5rem; font-family: var(--font-display)">Secure Your Spot</h4>
-        <div style="display: flex; gap: 1rem; margin-bottom: 1rem;">
-          <input type="text" id="booking_name" placeholder="Your Name" required style="width: 50%; padding: 0.6rem; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.03); color: white;">
-          <input type="email" id="booking_email" placeholder="Your Email" required style="width: 50%; padding: 0.6rem; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.03); color: white;">
+      ${data.bookingUrl ? `
+        <div style="margin-top: 1.5rem; text-align: center;">
+          <a href="${data.bookingUrl}" target="_blank" rel="noopener noreferrer" class="btn btn-primary btn-block" style="display: flex; align-items: center; justify-content: center; gap: 0.5rem; text-decoration: none; padding: 0.85rem; font-size: 1.05rem;">
+            ${data.ctaText || 'Book Tickets Now 🎟️'}
+          </a>
         </div>
-        <button type="submit" class="btn btn-primary btn-block">${data.ctaText}</button>
-      </form>
+      ` : `
+        <form class="modal-booking-form" id="modalBookingForm">
+          <h4 style="margin-bottom: 0.5rem; font-family: var(--font-display)">Secure Your Spot</h4>
+          <div style="display: flex; gap: 1rem; margin-bottom: 1rem;">
+            <input type="text" id="booking_name" placeholder="Your Name" required style="width: 50%; padding: 0.6rem; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.03); color: white;">
+            <input type="email" id="booking_email" placeholder="Your Email" required style="width: 50%; padding: 0.6rem; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.03); color: white;">
+          </div>
+          <button type="submit" class="btn btn-primary btn-block">${data.ctaText}</button>
+        </form>
+      `}
     `;
 
     eventModal.classList.add('active');
@@ -250,50 +268,52 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Handle booking submit inside modal
     const bookingForm = document.getElementById('modalBookingForm');
-    const bookingSubmitBtn = bookingForm.querySelector('button[type="submit"]');
+    if (bookingForm) {
+      const bookingSubmitBtn = bookingForm.querySelector('button[type="submit"]');
 
-    bookingForm.addEventListener('submit', async (e) => {
-      e.preventDefault();
+      bookingForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
 
-      const name = document.getElementById('booking_name').value;
-      const email = document.getElementById('booking_email').value;
-      const originalBtnText = bookingSubmitBtn.innerHTML;
+        const name = document.getElementById('booking_name').value;
+        const email = document.getElementById('booking_email').value;
+        const originalBtnText = bookingSubmitBtn.innerHTML;
 
-      // Loading state
-      bookingSubmitBtn.disabled = true;
-      bookingSubmitBtn.innerHTML = 'Sending... ⏳';
+        // Loading state
+        bookingSubmitBtn.disabled = true;
+        bookingSubmitBtn.innerHTML = 'Sending... ⏳';
 
-      const response = await sendToWeb3Forms({
-        name: name,
-        email: email,
-        subject: `[Event Booking] ${data.title}`,
-        message: `Booking request details:\n- Event: ${data.title}\n- Time: ${data.time}\n- Location: ${data.location}\n- Client Email: ${email}`
+        const response = await sendToWeb3Forms({
+          name: name,
+          email: email,
+          subject: `[Event Booking] ${data.title}`,
+          message: `Booking request details:\n- Event: ${data.title}\n- Time: ${data.time}\n- Location: ${data.location}\n- Client Email: ${email}`
+        });
+
+        if (response.success) {
+          modalContent.innerHTML = `
+            <div style="text-align: center; padding: 3rem 1.5rem;">
+              <div style="font-size: 3rem; margin-bottom: 1.5rem;">✨</div>
+              <h3 class="modal-title" style="margin-bottom: 1rem;">Our Team Will Get Back to You!</h3>
+              <p class="modal-description" style="margin-bottom: 2rem;">
+                Thank you, <strong>${name}</strong>! We have received your inquiry for <strong>${data.title}</strong>. Our team will get in touch with you at <strong>${email}</strong> shortly with all the details.
+              </p>
+              ${response.isDemo ? `
+                <div style="margin: -1rem auto 2rem auto; padding: 0.75rem; border-radius: 8px; background: rgba(168,85,247,0.15); border: 1px dashed #a855f7; max-width: 400px; font-size: 0.85rem; color: #d8b4fe; line-height: 1.4;">
+                  <strong>🔧 Developer Demo Mode:</strong> To receive actual emails, configure your Web3Forms access key in the <code>app.js</code> file.
+                </div>
+              ` : ''}
+              <button class="btn btn-primary" id="modalConfirmDone">Done</button>
+            </div>
+          `;
+          document.getElementById('modalConfirmDone').addEventListener('click', closeModal);
+        } else {
+          // Reset loading state
+          bookingSubmitBtn.disabled = false;
+          bookingSubmitBtn.innerHTML = originalBtnText;
+          alert(`Failed to send request: ${response.message || 'Please check your connection and try again.'}`);
+        }
       });
-
-      if (response.success) {
-        modalContent.innerHTML = `
-          <div style="text-align: center; padding: 3rem 1.5rem;">
-            <div style="font-size: 3rem; margin-bottom: 1.5rem;">✨</div>
-            <h3 class="modal-title" style="margin-bottom: 1rem;">Our Team Will Get Back to You!</h3>
-            <p class="modal-description" style="margin-bottom: 2rem;">
-              Thank you, <strong>${name}</strong>! We have received your inquiry for <strong>${data.title}</strong>. Our team will get in touch with you at <strong>${email}</strong> shortly with all the details.
-            </p>
-            ${response.isDemo ? `
-              <div style="margin: -1rem auto 2rem auto; padding: 0.75rem; border-radius: 8px; background: rgba(168,85,247,0.15); border: 1px dashed #a855f7; max-width: 400px; font-size: 0.85rem; color: #d8b4fe; line-height: 1.4;">
-                <strong>🔧 Developer Demo Mode:</strong> To receive actual emails, configure your Web3Forms access key in the <code>app.js</code> file.
-              </div>
-            ` : ''}
-            <button class="btn btn-primary" id="modalConfirmDone">Done</button>
-          </div>
-        `;
-        document.getElementById('modalConfirmDone').addEventListener('click', closeModal);
-      } else {
-        // Reset loading state
-        bookingSubmitBtn.disabled = false;
-        bookingSubmitBtn.innerHTML = originalBtnText;
-        alert(`Failed to send request: ${response.message || 'Please check your connection and try again.'}`);
-      }
-    });
+    }
   }
 
   function closeModal() {
