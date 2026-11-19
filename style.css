@@ -848,6 +848,8 @@ a.detail-value:hover { background-size: 100% 2px; }
   box-shadow: 0 0 0 4px rgba(123, 47, 247, 0.18);
 }
 .contact-form .btn { margin-top: 0.5rem; }
+.form-error { color: #B0124F; font-weight: 600; font-size: 0.95rem; }
+.form-error:empty { display: none; }
 
 /* ---------- Footer ---------- */
 .main-footer { padding-top: clamp(4rem, 8vw, 6rem); overflow: hidden; }

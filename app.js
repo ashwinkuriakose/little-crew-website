@@ -95,20 +95,37 @@ async function sendToWeb3Forms(data) {
 
 // Saves the form to the database (for the admin panel) AND sends the email
 // notification. Succeeds if at least one of the two works.
+function saveFailedMessage() {
+  const phoneEl = document.querySelector('[data-cms="contact.phone"]');
+  const phone = phoneEl ? phoneEl.textContent.trim() : '';
+  return "We couldn't save your details. Please check your connection and try again" +
+    (phone ? `, or call us on ${phone}.` : '.');
+}
+
+// Saves the form to the database (what the admin panel shows) and then sends
+// the email notification. When the database is connected, the form only counts
+// as sent once the database save works — so nothing can silently go missing.
 async function submitForm(record, emailData) {
-  const [dbResult, mailResult] = await Promise.allSettled([
-    DB_ENABLED ? saveSubmission(record) : Promise.resolve('skipped'),
-    sendToWeb3Forms(emailData)
-  ]);
+  if (DB_ENABLED) {
+    try {
+      await saveSubmission(record);
+    } catch (error) {
+      console.error('Could not save form to the database:', error);
+      return { success: false, message: saveFailedMessage() };
+    }
+    // Saved: the email is a bonus notification, so its result doesn't change the outcome
+    sendToWeb3Forms(emailData).then(mail => {
+      if (!mail.success && !mail.skipped) console.warn('Email notification failed:', mail.message);
+    });
+    return { success: true };
+  }
 
-  if (dbResult.status === 'rejected') console.error(dbResult.reason);
-  const savedToDb = DB_ENABLED && dbResult.status === 'fulfilled';
-  const mail = mailResult.status === 'fulfilled' ? mailResult.value : { success: false };
-
+  // No database configured: email is the only record
+  const mail = await sendToWeb3Forms(emailData);
   return {
-    success: savedToDb || !!mail.success,
-    isDemo: !DB_ENABLED && !!mail.isDemo,
-    message: mail.message
+    success: !!mail.success,
+    isDemo: !!mail.isDemo,
+    message: mail.success ? '' : "We couldn't send your message. Please check your connection and try again."
   };
 }
 
@@ -541,6 +558,7 @@ document.addEventListener('DOMContentLoaded', () => {
           <input type="text" id="booking_name" placeholder="Your Name" required maxlength="200" style="width: 50%; padding: 0.6rem; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.03); color: white;">
           <input type="email" id="booking_email" placeholder="Your Email" required maxlength="320" style="width: 50%; padding: 0.6rem; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.03); color: white;">
         </div>
+        <p class="waitlist-error" id="enquiryError" role="alert"></p>
         ${honeypot}
         <button type="submit" class="btn btn-primary btn-block">${escapeHtml(data.ctaText)}</button>
       </form>`;
@@ -622,7 +640,8 @@ document.addEventListener('DOMContentLoaded', () => {
     } else {
       submitBtn.disabled = false;
       submitBtn.innerHTML = originalBtnText;
-      alert(`Failed to send request: ${response.message || 'Please check your connection and try again.'}`);
+      const errorEl = document.getElementById(isWaitlist ? 'waitlistError' : 'enquiryError');
+      if (errorEl) errorEl.textContent = response.message || saveFailedMessage();
     }
   }
 
@@ -651,6 +670,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // ==========================================
   const contactForm = document.getElementById('contactForm');
   const contactSubmitBtn = contactForm.querySelector('button[type="submit"]');
+  const contactError = document.getElementById('contactError');
 
   contactForm.addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -662,6 +682,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const message = document.getElementById('form_message').value.trim();
     const isBot = document.getElementById('form_website').value !== '';
     const originalBtnText = contactSubmitBtn.innerHTML;
+    contactError.textContent = '';
 
     // Loading state
     contactSubmitBtn.disabled = true;
@@ -702,7 +723,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       document.getElementById('modalConfirmDone').addEventListener('click', closeModal);
     } else {
-      alert(`Failed to send message: ${response.message || 'Please check your connection and try again.'}`);
+      contactError.textContent = response.message || saveFailedMessage();
     }
 
     // Reset button state
