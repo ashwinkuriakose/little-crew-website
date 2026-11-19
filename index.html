@@ -60,7 +60,7 @@
   </header>
 
   <!-- Mobile Navigation Overlay -->
-  <div class="mobile-nav-overlay" id="mobileNav">
+  <div class="mobile-nav-overlay" id="mobileNav" data-lenis-prevent>
     <nav class="mobile-nav" aria-label="Mobile navigation">
       <a href="#about" class="mobile-nav-item">About</a>
       <a href="#services" class="mobile-nav-item">Services</a>
@@ -495,7 +495,7 @@
   </footer>
 
   <!-- Event details / booking popup -->
-  <div class="modal-backdrop" id="eventModal" role="dialog" aria-modal="true" aria-label="Event details">
+  <div class="modal-backdrop" id="eventModal" role="dialog" aria-modal="true" aria-label="Event details" data-lenis-prevent>
     <div class="modal-card">
       <button class="modal-close" id="modalCloseBtn" aria-label="Close">&times;</button>
       <div class="modal-body" id="modalContent"></div>
@@ -505,7 +505,7 @@
   <script src="https://cdn.jsdelivr.net/npm/lenis@1.1.13/dist/lenis.min.js" defer></script>
   <script src="cms-config.js?v=1"></script>
   <script src="app.js?v=3.2"></script>
-  <script src="effects.js?v=1.0" defer></script>
+  <script src="effects.js?v=1.1" defer></script>
 </body>
 
 </html>
