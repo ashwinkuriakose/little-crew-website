@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Admin | Little Crew & Co</title>
+  <link rel="icon" href="../assets/logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="admin.css?v=1">
+</head>
+
+<body>
+  <!-- Shown while checking the session -->
+  <div class="screen center" id="loadingScreen">
+    <div class="spinner"></div>
+  </div>
+
+  <!-- Not configured -->
+  <div class="screen center hidden" id="setupScreen">
+    <div class="auth-card">
+      <img src="../assets/logo.png" alt="" class="auth-logo">
+      <h1>Admin panel not connected</h1>
+      <p class="muted">Add your Supabase Project URL and anon key to <code>cms-config.js</code> in the website folder, then reload this page.
+        Step-by-step instructions are in <code>ADMIN-SETUP.md</code>.</p>
+    </div>
+  </div>
+
+  <!-- Login -->
+  <div class="screen center hidden" id="loginScreen">
+    <form class="auth-card" id="loginForm">
+      <img src="../assets/logo.png" alt="" class="auth-logo">
+      <h1>Admin sign in</h1>
+      <label class="field">
+        <span>Email</span>
+        <input type="email" id="loginEmail" required autocomplete="username">
+      </label>
+      <label class="field">
+        <span>Password</span>
+        <input type="password" id="loginPassword" required autocomplete="current-password">
+      </label>
+      <p class="form-error" id="loginError"></p>
+      <button type="submit" class="btn btn-primary btn-block" id="loginBtn">Sign in</button>
+    </form>
+  </div>
+
+  <!-- Not an admin -->
+  <div class="screen center hidden" id="deniedScreen">
+    <div class="auth-card">
+      <img src="../assets/logo.png" alt="" class="auth-logo">
+      <h1>No admin access</h1>
+      <p class="muted">You're signed in as <strong id="deniedEmail"></strong>, but this account isn't on the admin list.
+        Add it with the last step in <code>supabase/schema.sql</code>.</p>
+      <button class="btn btn-ghost btn-block" data-action="sign-out">Sign out</button>
+    </div>
+  </div>
+
+  <!-- App -->
+  <div class="app hidden" id="app">
+    <header class="topbar">
+      <div class="brand">
+        <img src="../assets/logo.png" alt="Little Crew & Co">
+        <span>Admin</span>
+      </div>
+      <nav class="tabs" role="tablist">
+        <button class="tab active" data-tab="submissions" role="tab">Submissions <span class="pill" id="newCount" hidden></span></button>
+        <button class="tab" data-tab="events" role="tab">Events</button>
+        <button class="tab" data-tab="content" role="tab">Website text</button>
+      </nav>
+      <div class="topbar-right">
+        <a href="../" target="_blank" class="btn btn-ghost btn-sm">View site ↗</a>
+        <button class="btn btn-ghost btn-sm" data-action="sign-out" title="Sign out">Sign out</button>
+      </div>
+    </header>
+
+    <main class="main">
+      <!-- ============ SUBMISSIONS ============ -->
+      <section class="panel" id="tab-submissions">
+        <div class="panel-head">
+          <div>
+            <h2>Form submissions</h2>
+            <p class="muted" id="subSummary">Loading…</p>
+          </div>
+          <div class="head-actions">
+            <button class="btn btn-ghost btn-sm" id="subRefresh">↻ Refresh</button>
+            <button class="btn btn-primary btn-sm" id="subExport">⬇ Download CSV</button>
+          </div>
+        </div>
+
+        <div class="toolbar">
+          <input type="search" id="subSearch" placeholder="Search name, email, message…" class="grow">
+          <select id="subForm">
+            <option value="">All forms</option>
+            <option value="contact">Contact form</option>
+            <option value="booking">Event enquiries</option>
+            <option value="waitlist">Waitlists</option>
+          </select>
+          <select id="subEvent">
+            <option value="">All events</option>
+          </select>
+          <select id="subStatus">
+            <option value="">Any status</option>
+            <option value="new">New</option>
+            <option value="read">Read</option>
+            <option value="archived">Archived</option>
+          </select>
+          <label class="date-field">From <input type="date" id="subFrom"></label>
+          <label class="date-field">To <input type="date" id="subTo"></label>
+        </div>
+
+        <div class="bulkbar hidden" id="bulkBar">
+          <span id="bulkCount"></span>
+          <button class="btn btn-ghost btn-sm" data-bulk="read">Mark read</button>
+          <button class="btn btn-ghost btn-sm" data-bulk="new">Mark new</button>
+          <button class="btn btn-ghost btn-sm" data-bulk="archived">Archive</button>
+          <button class="btn btn-ghost btn-sm" data-bulk="export">Download selected</button>
+          <button class="btn btn-danger btn-sm" data-bulk="delete">Delete</button>
+        </div>
+
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th class="col-check"><input type="checkbox" id="subCheckAll" aria-label="Select all"></th>
+                <th data-sort="created_at">Date</th>
+                <th data-sort="form">Form</th>
+                <th data-sort="name">Name</th>
+                <th data-sort="email">Email</th>
+                <th>Phone</th>
+                <th data-sort="postcode">Postcode</th>
+                <th data-sort="subject">Subject / Event</th>
+                <th>Message</th>
+                <th data-sort="status">Status</th>
+              </tr>
+            </thead>
+            <tbody id="subBody"></tbody>
+          </table>
+          <div class="empty hidden" id="subEmpty">No submissions match.</div>
+        </div>
+        <div class="pager" id="subPager"></div>
+      </section>
+
+      <!-- ============ EVENTS ============ -->
+      <section class="panel hidden" id="tab-events">
+        <div class="panel-head">
+          <div>
+            <h2>Events</h2>
+            <p class="muted">Use the arrows to change the order. Hidden events don't show on the website.</p>
+          </div>
+          <div class="head-actions">
+            <button class="btn btn-primary btn-sm" id="eventAdd">+ Add event</button>
+          </div>
+        </div>
+        <div class="event-list" id="eventList"></div>
+      </section>
+
+      <!-- ============ WEBSITE TEXT ============ -->
+      <section class="panel hidden" id="tab-content">
+        <div class="panel-head">
+          <div>
+            <h2>Website text</h2>
+            <p class="muted">Edit any text on the homepage. Changed fields are highlighted until you save.</p>
+          </div>
+          <div class="head-actions">
+            <button class="btn btn-primary btn-sm" id="contentSave" disabled>Save changes</button>
+          </div>
+        </div>
+        <div class="content-sections" id="contentSections"></div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Submission detail drawer -->
+  <div class="drawer-backdrop hidden" id="subDrawer">
+    <aside class="drawer">
+      <button class="drawer-close" data-close="subDrawer" aria-label="Close">&times;</button>
+      <div id="subDetail"></div>
+    </aside>
+  </div>
+
+  <!-- Event editor -->
+  <div class="drawer-backdrop hidden" id="eventDrawer">
+    <aside class="drawer drawer-wide">
+      <button class="drawer-close" data-close="eventDrawer" aria-label="Close">&times;</button>
+      <form id="eventForm" class="event-form">
+        <h2 id="eventFormTitle">Edit event</h2>
+
+        <div class="form-section">
+          <h3>Basics</h3>
+          <div class="grid-2">
+            <label class="field"><span>Event name *</span><input name="title" required maxlength="200"></label>
+            <label class="field"><span>Section</span>
+              <select name="category">
+                <option value="upcoming">Upcoming</option>
+                <option value="past">Past</option>
+              </select>
+            </label>
+          </div>
+          <label class="field check"><input type="checkbox" name="published"> <span>Show on website</span></label>
+        </div>
+
+        <div class="form-section">
+          <h3>Poster image</h3>
+          <div class="image-picker">
+            <div class="image-preview" id="eventImagePreview"><span class="muted">No image</span></div>
+            <div class="image-controls">
+              <label class="btn btn-ghost btn-sm file-btn">Upload image<input type="file" accept="image/*" id="eventImageFile" hidden></label>
+              <label class="field"><span>…or image link</span><input name="image_url" placeholder="https://…"></label>
+              <p class="hint" id="eventImageStatus"></p>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <h3>Event card</h3>
+          <div class="grid-3">
+            <label class="field"><span>Date badge – top</span><input name="date_day" placeholder="03" maxlength="10"></label>
+            <label class="field"><span>Date badge – middle</span><input name="date_month" placeholder="JAN" maxlength="10"></label>
+            <label class="field"><span>Date badge – bottom</span><input name="date_year" placeholder="2027" maxlength="10"></label>
+          </div>
+          <div class="grid-2">
+            <label class="field"><span>Label on image</span><input name="status_pill" placeholder="🎉 New Year 2027"></label>
+            <label class="field"><span>Label colour</span>
+              <select name="pill_style">
+                <option value="upcoming">Pink (upcoming)</option>
+                <option value="tour">Blue (tour)</option>
+                <option value="past">Grey (past)</option>
+              </select>
+            </label>
+          </div>
+          <div class="grid-2">
+            <label class="field"><span>Time line</span><input name="time_label" placeholder="⏰ Gate Opens: 5:00 PM"></label>
+            <label class="field"><span>Location line</span><input name="location" placeholder="📍 Venue, Postcode"></label>
+          </div>
+          <label class="field"><span>Tagline</span><input name="tagline" placeholder="New Year Party • Venue"></label>
+          <label class="field"><span>Short description</span><textarea name="summary" rows="3"></textarea></label>
+          <label class="field"><span>Tags (one per line)</span><textarea name="badges" rows="3" placeholder="🎧 Live DJ&#10;🍛 Food Stall"></textarea></label>
+          <label class="field"><span>How people book</span>
+            <select name="booking_mode">
+              <option value="tickets">Tickets on sale — “Book Now” opens the ticket link</option>
+              <option value="waitlist">Waitlist — form for name, email, UK phone &amp; postcode</option>
+              <option value="enquiry">Enquiry — simple name &amp; email form</option>
+            </select>
+          </label>
+          <div class="grid-2">
+            <label class="field" id="bookingUrlField"><span id="bookingUrlLabel">Ticket link for this event</span><input name="booking_url" type="url" placeholder="https://…"></label>
+            <label class="field"><span>Contact phone (adds "Call")</span><input name="phone" placeholder="+447388890443"></label>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <h3>Details popup <span class="muted small">(optional — uses the card info if empty)</span></h3>
+          <label class="field"><span>Popup title</span><input name="details_title"></label>
+          <div class="grid-2">
+            <label class="field"><span>Date &amp; time</span><input name="details_time" placeholder="Sunday, January 3rd, 2027 • 5:00 PM"></label>
+            <label class="field"><span>Full venue address</span><input name="details_location"></label>
+          </div>
+          <label class="field"><span>Artist(s)</span><input name="artist"></label>
+          <label class="field"><span>Full description</span><textarea name="description" rows="5"></textarea></label>
+          <label class="field"><span>Button text</span><input name="cta_text" placeholder="Book Tickets / Send Enquiry"></label>
+          <p class="hint">Waitlist and enquiry sign-ups land in Submissions, where you can filter by event and download them.</p>
+        </div>
+
+        <div class="form-foot">
+          <p class="form-error" id="eventError"></p>
+          <button type="button" class="btn btn-ghost" data-close="eventDrawer">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="eventSaveBtn">Save event</button>
+        </div>
+      </form>
+    </aside>
+  </div>
+
+  <div class="toast hidden" id="toast"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+  <script src="../cms-config.js?v=1"></script>
+  <script src="admin.js?v=1"></script>
+</body>
+
+</html>

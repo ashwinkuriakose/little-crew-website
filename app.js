@@ -1,11 +1,71 @@
 // ==========================================
-// Web3Forms Configuration
+// Web3Forms Configuration (email notifications)
 // Get your free access key at https://web3forms.com
 // ==========================================
 const WEB3FORMS_ACCESS_KEY = '5361e138-314b-4046-9d2c-526581028f5e';
 
+// ==========================================
+// CMS / Database (Supabase) — configured in cms-config.js
+// ==========================================
+const CMS = window.CMS_CONFIG || {};
+const DB_ENABLED = !!(CMS.SUPABASE_URL && CMS.SUPABASE_ANON_KEY);
+
+async function dbRequest(path, options = {}) {
+  const url = `${CMS.SUPABASE_URL.replace(/\/$/, '')}/rest/v1/${path}`;
+  const response = await fetch(url, {
+    ...options,
+    headers: {
+      apikey: CMS.SUPABASE_ANON_KEY,
+      Authorization: `Bearer ${CMS.SUPABASE_ANON_KEY}`,
+      'Content-Type': 'application/json',
+      ...(options.headers || {})
+    }
+  });
+  if (!response.ok) {
+    throw new Error(`Database request failed (${response.status}): ${await response.text()}`);
+  }
+  const text = await response.text();
+  return text ? JSON.parse(text) : null;
+}
+
+function saveSubmission(record) {
+  return dbRequest('submissions', {
+    method: 'POST',
+    headers: { Prefer: 'return=minimal' },
+    body: JSON.stringify(record)
+  });
+}
+
+function escapeHtml(value) {
+  return String(value ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+// UK phone: accepts 07…, +44 7…, 0044…, landlines; returns +44 format or null
+function normaliseUkPhone(value) {
+  const digits = String(value || '').replace(/[\s()\-.]/g, '');
+  const match = digits.match(/^(?:\+44|0044|0)([1-9]\d{8,9})$/);
+  return match ? '+44' + match[1] : null;
+}
+
+// UK postcode: returns e.g. "TN1 1XF" or null
+function normaliseUkPostcode(value) {
+  const compact = String(value || '').toUpperCase().replace(/\s+/g, '');
+  if (!/^(?:[A-Z]{1,2}\d[A-Z\d]?|GIR)\d[A-Z]{2}$/.test(compact)) return null;
+  return compact.slice(0, -3) + ' ' + compact.slice(-3);
+}
+
 // Helper function to submit form data to Web3Forms
 async function sendToWeb3Forms(data) {
+  if (window.CMS_CONFIG && window.CMS_CONFIG.DISABLE_EMAIL) {
+    console.info('Email sending is off (local demo). Form data:', data);
+    return { success: true, skipped: true };
+  }
+
   if (WEB3FORMS_ACCESS_KEY === 'YOUR_ACCESS_KEY_HERE' || !WEB3FORMS_ACCESS_KEY) {
     console.warn('Web3Forms Access Key is not configured. Form data:', data);
     // Simulate network delay and return success for testing/demo purposes
@@ -31,6 +91,25 @@ async function sendToWeb3Forms(data) {
     console.error('Error submitting form to Web3Forms:', error);
     return { success: false, message: error.message || 'Connection error' };
   }
+}
+
+// Saves the form to the database (for the admin panel) AND sends the email
+// notification. Succeeds if at least one of the two works.
+async function submitForm(record, emailData) {
+  const [dbResult, mailResult] = await Promise.allSettled([
+    DB_ENABLED ? saveSubmission(record) : Promise.resolve('skipped'),
+    sendToWeb3Forms(emailData)
+  ]);
+
+  if (dbResult.status === 'rejected') console.error(dbResult.reason);
+  const savedToDb = DB_ENABLED && dbResult.status === 'fulfilled';
+  const mail = mailResult.status === 'fulfilled' ? mailResult.value : { success: false };
+
+  return {
+    success: savedToDb || !!mail.success,
+    isDemo: !DB_ENABLED && !!mail.isDemo,
+    message: mail.message
+  };
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -135,54 +214,49 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // ==========================================
-  // 5. Events Category Filter
+  // 5. Editable Content (from the admin panel)
   // ==========================================
-  const filterBtns = document.querySelectorAll('.filter-btn');
-  const eventCards = document.querySelectorAll('.event-card');
-  const pastEventsBlock = document.getElementById('pastEventsBlock');
+  function richText(value, className) {
+    // *word* → highlighted span, new line → line break
+    return escapeHtml(value)
+      .replace(/\*(.+?)\*/g, `<span class="${className}">$1</span>`)
+      .replace(/\n/g, '<br>');
+  }
 
-  filterBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
-      // Toggle active button style
-      filterBtns.forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
+  function applyContent(content) {
+    document.querySelectorAll('[data-cms]').forEach(el => {
+      const value = content[el.dataset.cms];
+      if (value === undefined || value === null) return;
 
-      const filterValue = btn.getAttribute('data-filter');
+      if (el.dataset.cmsAttr) {
+        el.setAttribute(el.dataset.cmsAttr, value);
+        if (el.classList.contains('stat-num') && countersAnimated) el.innerText = value;
+        return;
+      }
 
-      eventCards.forEach(card => {
-        const category = card.getAttribute('data-category');
+      if (el.dataset.cmsRich) {
+        el.innerHTML = richText(value, el.dataset.cmsRich);
+      } else {
+        el.textContent = value;
+      }
 
-        if (filterValue === 'all') {
-          card.style.display = 'flex';
-          card.style.animation = 'fadeIn 0.5s forwards';
-        } else if (category === filterValue) {
-          card.style.display = 'flex';
-          card.style.animation = 'fadeIn 0.5s forwards';
-        } else {
-          card.style.display = 'none';
-        }
-      });
-
-      // Show or hide the Past Events sub-section block
-      if (pastEventsBlock) {
-        if (filterValue === 'upcoming') {
-          pastEventsBlock.style.display = 'none';
-        } else {
-          pastEventsBlock.style.display = 'block';
-        }
+      if (el.dataset.cmsHref) {
+        const prefix = el.dataset.cmsHref;
+        el.href = prefix + (prefix === 'tel:' ? value.replace(/[^\d+]/g, '') : value.trim());
       }
     });
-  });
+  }
 
   // ==========================================
-  // 6. Interactive Event Details & Booking Modals
+  // 6. Events (rendered from the database when configured)
   // ==========================================
-  const eventModal = document.getElementById('eventModal');
-  const modalCloseBtn = document.getElementById('modalCloseBtn');
-  const modalContent = document.getElementById('modalContent');
-  const openModalButtons = document.querySelectorAll('.open-event-modal');
+  const upcomingGrid = document.getElementById('upcomingGrid');
+  const pastGrid = document.getElementById('pastGrid');
+  const pastEventsBlock = document.getElementById('pastEventsBlock');
+  const filterBtns = document.querySelectorAll('.filter-btn');
 
-  const eventsData = {
+  // Built-in details, used when the database isn't configured
+  let eventsData = {
     anarkali_marikar: {
       title: 'Anarkali Marikar Remix — New Year Party',
       image: 'assets/anarkali_marikar_live.jpg',
@@ -219,100 +293,325 @@ document.addEventListener('DOMContentLoaded', () => {
       artist: 'DJ Julix',
       description: 'The ultimate multilingual DJ night. Live, loud, and unlimited fun! Experience amazing beats, non-stop entertainment, and the best party vibes with DJ Julix. This event has concluded. Contact us for private bookings and future party series!',
       ctaText: 'Inquire for Future Events'
-    },
-    night_club: {
-      title: 'Night Club Party',
-      image: 'assets/night_club_party.png',
-      time: 'Saturday, July 25th, 2026 - 9:00 PM onwards',
-      location: 'Mercure Hotel, Main Room',
-      artist: 'DJ Julia',
-      description: 'Step into the night with high-energy tracks, custom visual effects, and a spectacular smoke and light show. Bring your crew for a premium clubbing event.',
-      ctaText: 'Reserve Club Pass'
     }
   };
+
+  function safeUrl(url) {
+    const value = String(url || '').trim();
+    return /^(https?:|mailto:|tel:)/i.test(value) || !/^[a-z]+:/i.test(value) ? value : '';
+  }
+
+  // 'tickets' (link), 'waitlist' (waitlist form) or 'enquiry' (name + email form)
+  function bookingMode(ev) {
+    const mode = ev.booking_mode || (ev.booking_url ? 'tickets' : 'enquiry');
+    return mode === 'tickets' && !safeUrl(ev.booking_url) ? 'enquiry' : mode;
+  }
+
+  function eventCardHtml(ev) {
+    const isPast = ev.category === 'past';
+    const pillClass = { upcoming: 'upcoming-pill', tour: 'tour-pill', past: 'past-pill' }[ev.pill_style] || 'upcoming-pill';
+    const badges = (ev.badges || []).filter(Boolean);
+    const mode = bookingMode(ev);
+    const bookingUrl = safeUrl(ev.booking_url);
+    const phone = String(ev.phone || '').replace(/[^\d+]/g, '');
+
+    let actions = '';
+    if (isPast) {
+      actions = `<button class="btn btn-outline btn-sm btn-block open-event-modal" data-event-id="${escapeHtml(ev.id)}">View Event Highlights 📸</button>`;
+    } else {
+      if (mode === 'tickets') {
+        actions += `<a href="${escapeHtml(bookingUrl)}" target="_blank" rel="noopener noreferrer" class="btn btn-primary btn-sm">Book Now 🎟️</a>`;
+      } else if (mode === 'waitlist') {
+        actions += `<button class="btn btn-primary btn-sm open-event-modal" data-event-id="${escapeHtml(ev.id)}">Join Waitlist 📝</button>`;
+      }
+      if (phone) {
+        actions += `<a href="tel:${escapeHtml(phone)}" class="btn btn-outline btn-sm">Call Contact 📞</a>`;
+      }
+      if (!actions) {
+        actions = `<button class="btn btn-primary btn-sm open-event-modal" data-event-id="${escapeHtml(ev.id)}">More Details</button>`;
+      }
+    }
+
+    return `
+      <div class="event-card glass-card${isPast ? ' past-event-card' : ''}" data-category="${isPast ? 'past' : 'upcoming'}"${isPast ? ' style="max-width: 520px; width: 100%;"' : ''}>
+        <div class="event-image-wrapper open-event-modal" data-event-id="${escapeHtml(ev.id)}" title="Click to view details">
+          ${ev.image_url ? `<img src="${escapeHtml(safeUrl(ev.image_url))}" alt="${escapeHtml(ev.title)} poster" class="event-image${isPast ? ' past-event-image' : ''}" loading="lazy">` : ''}
+          ${(ev.date_day || ev.date_month || ev.date_year) ? `
+          <div class="event-date-badge${isPast ? ' past-date' : ''}">
+            <span class="day">${escapeHtml(ev.date_day)}</span>
+            <span class="month">${escapeHtml(ev.date_month)}</span>
+            <span class="year">${escapeHtml(ev.date_year)}</span>
+          </div>` : ''}
+          ${ev.status_pill ? `<div class="event-status-pill ${pillClass}">${escapeHtml(ev.status_pill)}</div>` : ''}
+        </div>
+        <div class="event-info">
+          <div class="event-meta">
+            ${ev.time_label ? `<span class="event-time">${escapeHtml(ev.time_label)}</span>` : ''}
+            ${ev.location ? `<span class="event-location">${escapeHtml(ev.location)}</span>` : ''}
+          </div>
+          <h3 class="event-title">${escapeHtml(ev.title)}</h3>
+          ${ev.tagline ? `<div class="event-tagline-text"${isPast ? ' style="color: var(--text-muted);"' : ''}>${escapeHtml(ev.tagline)}</div>` : ''}
+          ${ev.summary ? `<p class="event-desc">${escapeHtml(ev.summary)}</p>` : ''}
+          ${badges.length ? `<div class="event-artist-row">${badges.map(b => `<span class="artist-badge">${escapeHtml(b)}</span>`).join('')}</div>` : ''}
+          <div class="event-actions">${actions}</div>
+        </div>
+      </div>`;
+  }
+
+  function stripEmoji(text) {
+    return String(text || '').replace(/^[^\p{L}\p{N}]+/u, '').trim();
+  }
+
+  function renderEvents(events) {
+    const upcoming = events.filter(ev => ev.category !== 'past');
+    const past = events.filter(ev => ev.category === 'past');
+
+    upcomingGrid.innerHTML = upcoming.length
+      ? upcoming.map(eventCardHtml).join('')
+      : '<p class="section-subtitle" style="grid-column: 1 / -1; text-align: center;">New events are coming soon — stay tuned!</p>';
+    pastGrid.innerHTML = past.map(eventCardHtml).join('');
+    pastEventsBlock.dataset.empty = past.length ? '' : 'true';
+
+    eventsData = {};
+    events.forEach(ev => {
+      eventsData[ev.id] = {
+        title: ev.details_title || ev.title,
+        image: safeUrl(ev.image_url),
+        time: ev.details_time || stripEmoji(ev.time_label),
+        location: ev.details_location || stripEmoji(ev.location),
+        artist: ev.artist,
+        description: ev.description || ev.summary || '',
+        mode: bookingMode(ev),
+        ctaText: ev.cta_text || { tickets: 'Book Tickets Now 🎟️', waitlist: 'Join Waitlist 📝', enquiry: 'Send Enquiry' }[bookingMode(ev)],
+        bookingUrl: safeUrl(ev.booking_url)
+      };
+    });
+
+    document.getElementById('upcomingCount').textContent = upcoming.length;
+    document.getElementById('pastCount').textContent = past.length;
+
+    const active = document.querySelector('.filter-btn.active');
+    applyFilter(active ? active.getAttribute('data-filter') : 'all');
+  }
+
+  // ==========================================
+  // 7. Events Category Filter
+  // ==========================================
+  function applyFilter(filterValue) {
+    document.querySelectorAll('.event-card').forEach(card => {
+      const category = card.getAttribute('data-category');
+
+      if (filterValue === 'all' || category === filterValue) {
+        card.style.display = 'flex';
+        card.style.animation = 'fadeIn 0.5s forwards';
+      } else {
+        card.style.display = 'none';
+      }
+    });
+
+    // Show or hide the Past Events sub-section block
+    if (pastEventsBlock) {
+      const hide = filterValue === 'upcoming' || pastEventsBlock.dataset.empty === 'true';
+      pastEventsBlock.style.display = hide ? 'none' : 'block';
+    }
+  }
+
+  filterBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      // Toggle active button style
+      filterBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      applyFilter(btn.getAttribute('data-filter'));
+    });
+  });
+
+  // ==========================================
+  // 8. Load content & events from the database
+  // ==========================================
+  if (DB_ENABLED) {
+    dbRequest('site_content?select=key,value')
+      .then(rows => {
+        const content = {};
+        (rows || []).forEach(row => { content[row.key] = row.value; });
+        applyContent(content);
+      })
+      .catch(err => console.error('Could not load site content:', err));
+
+    dbRequest('events?select=*&published=eq.true&order=sort_order.asc,created_at.asc')
+      .then(rows => renderEvents(rows || []))
+      .catch(err => console.error('Could not load events:', err));
+  }
+
+  // ==========================================
+  // 9. Interactive Event Details & Booking Modals
+  // ==========================================
+  const eventModal = document.getElementById('eventModal');
+  const modalCloseBtn = document.getElementById('modalCloseBtn');
+  const modalContent = document.getElementById('modalContent');
+
+  function demoNotice(isDemo) {
+    return isDemo ? `
+      <div style="margin: -1rem auto 2rem auto; padding: 0.75rem; border-radius: 8px; background: rgba(168,85,247,0.15); border: 1px dashed #a855f7; max-width: 400px; font-size: 0.85rem; color: #d8b4fe; line-height: 1.4;">
+        <strong>🔧 Developer Demo Mode:</strong> To save submissions, add your Supabase details in <code>cms-config.js</code>.
+      </div>
+    ` : '';
+  }
 
   function openModal(eventId) {
     const data = eventsData[eventId];
     if (!data) return;
 
     modalContent.innerHTML = `
-      <img src="${data.image}" alt="${data.title}" class="modal-banner">
-      <h3 class="modal-title">${data.title}</h3>
+      ${data.image ? `<img src="${escapeHtml(data.image)}" alt="${escapeHtml(data.title)}" class="modal-banner">` : ''}
+      <h3 class="modal-title">${escapeHtml(data.title)}</h3>
       <div class="modal-meta-grid">
-        <div><strong>Artist:</strong> ${data.artist}</div>
-        <div><strong>Time:</strong> ${data.time}</div>
-        <div style="grid-column: span 2"><strong>Venue:</strong> ${data.location}</div>
+        ${data.artist ? `<div><strong>Artist:</strong> ${escapeHtml(data.artist)}</div>` : ''}
+        ${data.time ? `<div><strong>Time:</strong> ${escapeHtml(data.time)}</div>` : ''}
+        ${data.location ? `<div style="grid-column: span 2"><strong>Venue:</strong> ${escapeHtml(data.location)}</div>` : ''}
       </div>
-      <p class="modal-description">${data.description}</p>
-      
-      ${data.bookingUrl ? `
-        <div style="margin-top: 1.5rem; text-align: center;">
-          <a href="${data.bookingUrl}" target="_blank" rel="noopener noreferrer" class="btn btn-primary btn-block" style="display: flex; align-items: center; justify-content: center; gap: 0.5rem; text-decoration: none; padding: 0.85rem; font-size: 1.05rem;">
-            ${data.ctaText || 'Book Tickets Now 🎟️'}
-          </a>
-        </div>
-      ` : `
-        <form class="modal-booking-form" id="modalBookingForm">
-          <h4 style="margin-bottom: 0.5rem; font-family: var(--font-display)">Secure Your Spot</h4>
-          <div style="display: flex; gap: 1rem; margin-bottom: 1rem;">
-            <input type="text" id="booking_name" placeholder="Your Name" required style="width: 50%; padding: 0.6rem; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.03); color: white;">
-            <input type="email" id="booking_email" placeholder="Your Email" required style="width: 50%; padding: 0.6rem; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.03); color: white;">
-          </div>
-          <button type="submit" class="btn btn-primary btn-block">${data.ctaText}</button>
-        </form>
-      `}
+      <p class="modal-description">${escapeHtml(data.description)}</p>
+
+      ${modalActionHtml(data)}
     `;
 
     eventModal.classList.add('active');
     document.body.classList.add('no-scroll');
 
-    // Handle booking submit inside modal
-    const bookingForm = document.getElementById('modalBookingForm');
-    if (bookingForm) {
-      const bookingSubmitBtn = bookingForm.querySelector('button[type="submit"]');
+    const form = document.getElementById('modalBookingForm');
+    if (form) form.addEventListener('submit', e => handleEventForm(e, data));
+  }
 
-      bookingForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
+  function modalActionHtml(data) {
+    const mode = data.mode || (data.bookingUrl ? 'tickets' : 'enquiry');
+    const honeypot = '<input type="text" id="booking_website" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute; left:-9999px; width:1px; height:1px; opacity:0;">';
 
-        const name = document.getElementById('booking_name').value;
-        const email = document.getElementById('booking_email').value;
-        const originalBtnText = bookingSubmitBtn.innerHTML;
+    if (mode === 'tickets' && data.bookingUrl) {
+      return `
+        <div style="margin-top: 1.5rem; text-align: center;">
+          <a href="${escapeHtml(data.bookingUrl)}" target="_blank" rel="noopener noreferrer" class="btn btn-primary btn-block" style="display: flex; align-items: center; justify-content: center; gap: 0.5rem; text-decoration: none; padding: 0.85rem; font-size: 1.05rem;">
+            ${escapeHtml(data.ctaText || 'Book Tickets Now 🎟️')}
+          </a>
+        </div>`;
+    }
 
-        // Loading state
-        bookingSubmitBtn.disabled = true;
-        bookingSubmitBtn.innerHTML = 'Sending... ⏳';
+    if (mode === 'waitlist') {
+      return `
+        <form class="modal-booking-form waitlist-form" id="modalBookingForm" data-mode="waitlist" novalidate>
+          <h4 class="waitlist-heading">Join the Waitlist</h4>
+          <p class="waitlist-note">Booking isn't open yet. Join the waitlist and we'll let you know as soon as tickets are available.</p>
+          <div class="waitlist-grid">
+            <label class="waitlist-field">
+              <span>Full name</span>
+              <input type="text" id="booking_name" required maxlength="200" autocomplete="name" placeholder="Your name">
+            </label>
+            <label class="waitlist-field">
+              <span>Email</span>
+              <input type="email" id="booking_email" required maxlength="320" autocomplete="email" placeholder="you@example.com">
+            </label>
+            <label class="waitlist-field">
+              <span>UK contact number</span>
+              <input type="tel" id="booking_phone" required maxlength="20" autocomplete="tel" placeholder="07123 456789">
+            </label>
+            <label class="waitlist-field">
+              <span>UK postcode</span>
+              <input type="text" id="booking_postcode" required maxlength="10" autocomplete="postal-code" placeholder="TN1 1XF" style="text-transform: uppercase;">
+            </label>
+          </div>
+          <p class="waitlist-error" id="waitlistError" role="alert"></p>
+          ${honeypot}
+          <button type="submit" class="btn btn-primary btn-block">${escapeHtml(data.ctaText || 'Join Waitlist 📝')}</button>
+        </form>`;
+    }
 
-        const response = await sendToWeb3Forms({
-          name: name,
-          email: email,
+    return `
+      <form class="modal-booking-form" id="modalBookingForm" data-mode="enquiry">
+        <h4 style="margin-bottom: 0.5rem; font-family: var(--font-display)">Secure Your Spot</h4>
+        <div style="display: flex; gap: 1rem; margin-bottom: 1rem;">
+          <input type="text" id="booking_name" placeholder="Your Name" required maxlength="200" style="width: 50%; padding: 0.6rem; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.03); color: white;">
+          <input type="email" id="booking_email" placeholder="Your Email" required maxlength="320" style="width: 50%; padding: 0.6rem; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.03); color: white;">
+        </div>
+        ${honeypot}
+        <button type="submit" class="btn btn-primary btn-block">${escapeHtml(data.ctaText)}</button>
+      </form>`;
+  }
+
+  async function handleEventForm(e, data) {
+    e.preventDefault();
+    const form = e.currentTarget;
+    const isWaitlist = form.dataset.mode === 'waitlist';
+    const submitBtn = form.querySelector('button[type="submit"]');
+
+    const name = document.getElementById('booking_name').value.trim();
+    const email = document.getElementById('booking_email').value.trim();
+    const isBot = document.getElementById('booking_website').value !== '';
+    let phone = null;
+    let postcode = null;
+
+    if (isWaitlist) {
+      const errorBox = document.getElementById('waitlistError');
+      const phoneInput = document.getElementById('booking_phone');
+      const postcodeInput = document.getElementById('booking_postcode');
+      phone = normaliseUkPhone(phoneInput.value);
+      postcode = normaliseUkPostcode(postcodeInput.value);
+
+      const problems = [];
+      if (!name) problems.push([document.getElementById('booking_name'), 'Please enter your name.']);
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) problems.push([document.getElementById('booking_email'), 'Please enter a valid email address.']);
+      if (!phone) problems.push([phoneInput, 'Please enter a valid UK phone number, e.g. 07123 456789.']);
+      if (!postcode) problems.push([postcodeInput, 'Please enter a valid UK postcode, e.g. TN1 1XF.']);
+
+      form.querySelectorAll('input').forEach(input => input.removeAttribute('aria-invalid'));
+      if (problems.length) {
+        problems.forEach(([input]) => input.setAttribute('aria-invalid', 'true'));
+        errorBox.textContent = problems[0][1];
+        problems[0][0].focus();
+        return;
+      }
+      errorBox.textContent = '';
+      postcodeInput.value = postcode;
+    }
+
+    const originalBtnText = submitBtn.innerHTML;
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = 'Sending... ⏳';
+
+    const details = `Time: ${data.time || '-'}\nLocation: ${data.location || '-'}`;
+    const response = isBot ? { success: true } : await submitForm(
+      isWaitlist
+        ? { form: 'waitlist', name, email, phone, postcode, subject: `Waitlist: ${data.title}`.slice(0, 300), event_title: data.title.slice(0, 300), message: details }
+        : { form: 'booking', name, email, subject: `Event enquiry: ${data.title}`.slice(0, 300), event_title: data.title.slice(0, 300), message: details },
+      isWaitlist
+        ? {
+          name, email, phone,
+          subject: `[Waitlist] ${data.title}`,
+          message: `Waitlist sign-up:\n- Event: ${data.title}\n- Name: ${name}\n- Email: ${email}\n- Phone: ${phone}\n- Postcode: ${postcode}`
+        }
+        : {
+          name, email,
           subject: `[Event Booking] ${data.title}`,
           message: `Booking request details:\n- Event: ${data.title}\n- Time: ${data.time}\n- Location: ${data.location}\n- Client Email: ${email}`
-        });
-
-        if (response.success) {
-          modalContent.innerHTML = `
-            <div style="text-align: center; padding: 3rem 1.5rem;">
-              <div style="font-size: 3rem; margin-bottom: 1.5rem;">✨</div>
-              <h3 class="modal-title" style="margin-bottom: 1rem;">Our Team Will Get Back to You!</h3>
-              <p class="modal-description" style="margin-bottom: 2rem;">
-                Thank you, <strong>${name}</strong>! We have received your inquiry for <strong>${data.title}</strong>. Our team will get in touch with you at <strong>${email}</strong> shortly with all the details.
-              </p>
-              ${response.isDemo ? `
-                <div style="margin: -1rem auto 2rem auto; padding: 0.75rem; border-radius: 8px; background: rgba(168,85,247,0.15); border: 1px dashed #a855f7; max-width: 400px; font-size: 0.85rem; color: #d8b4fe; line-height: 1.4;">
-                  <strong>🔧 Developer Demo Mode:</strong> To receive actual emails, configure your Web3Forms access key in the <code>app.js</code> file.
-                </div>
-              ` : ''}
-              <button class="btn btn-primary" id="modalConfirmDone">Done</button>
-            </div>
-          `;
-          document.getElementById('modalConfirmDone').addEventListener('click', closeModal);
-        } else {
-          // Reset loading state
-          bookingSubmitBtn.disabled = false;
-          bookingSubmitBtn.innerHTML = originalBtnText;
-          alert(`Failed to send request: ${response.message || 'Please check your connection and try again.'}`);
         }
-      });
+    );
+
+    if (response.success) {
+      modalContent.innerHTML = `
+        <div style="text-align: center; padding: 3rem 1.5rem;">
+          <div style="font-size: 3rem; margin-bottom: 1.5rem;">${isWaitlist ? '📝' : '✨'}</div>
+          <h3 class="modal-title" style="margin-bottom: 1rem;">${isWaitlist ? "You're on the Waitlist!" : 'Our Team Will Get Back to You!'}</h3>
+          <p class="modal-description" style="margin-bottom: 2rem;">
+            ${isWaitlist
+              ? `Thank you, <strong>${escapeHtml(name)}</strong>! You've joined the waitlist for <strong>${escapeHtml(data.title)}</strong>. We'll contact you at <strong>${escapeHtml(email)}</strong> as soon as booking opens.`
+              : `Thank you, <strong>${escapeHtml(name)}</strong>! We have received your inquiry for <strong>${escapeHtml(data.title)}</strong>. Our team will get in touch with you at <strong>${escapeHtml(email)}</strong> shortly with all the details.`}
+          </p>
+          ${demoNotice(response.isDemo)}
+          <button class="btn btn-primary" id="modalConfirmDone">Done</button>
+        </div>
+      `;
+      document.getElementById('modalConfirmDone').addEventListener('click', closeModal);
+    } else {
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = originalBtnText;
+      alert(`Failed to send request: ${response.message || 'Please check your connection and try again.'}`);
     }
   }
 
@@ -321,11 +620,10 @@ document.addEventListener('DOMContentLoaded', () => {
     document.body.classList.remove('no-scroll');
   }
 
-  openModalButtons.forEach(btn => {
-    btn.addEventListener('click', () => {
-      const eventId = btn.getAttribute('data-event-id');
-      openModal(eventId);
-    });
+  // One listener handles every "open details" element, including events added later
+  document.addEventListener('click', (e) => {
+    const trigger = e.target.closest('.open-event-modal');
+    if (trigger) openModal(trigger.getAttribute('data-event-id'));
   });
 
   modalCloseBtn.addEventListener('click', closeModal);
@@ -334,7 +632,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // ==========================================
-  // 7. Contact Form Handling
+  // 10. Contact Form Handling
   // ==========================================
   const contactForm = document.getElementById('contactForm');
   const contactSubmitBtn = contactForm.querySelector('button[type="submit"]');
@@ -342,24 +640,28 @@ document.addEventListener('DOMContentLoaded', () => {
   contactForm.addEventListener('submit', async (e) => {
     e.preventDefault();
 
-    const name = document.getElementById('form_name').value;
-    const email = document.getElementById('form_email').value;
-    const phone = document.getElementById('form_phone').value;
+    const name = document.getElementById('form_name').value.trim();
+    const email = document.getElementById('form_email').value.trim();
+    const phone = document.getElementById('form_phone').value.trim();
     const subject = document.getElementById('form_subject').value;
-    const message = document.getElementById('form_message').value;
+    const message = document.getElementById('form_message').value.trim();
+    const isBot = document.getElementById('form_website').value !== '';
     const originalBtnText = contactSubmitBtn.innerHTML;
 
     // Loading state
     contactSubmitBtn.disabled = true;
     contactSubmitBtn.innerHTML = 'Sending... ⏳';
 
-    const response = await sendToWeb3Forms({
-      name: name,
-      email: email,
-      phone: phone,
-      subject: `[Contact Form] ${subject}`,
-      message: message
-    });
+    const response = isBot ? { success: true } : await submitForm(
+      { form: 'contact', name, email, phone: phone || null, subject, message: message.slice(0, 5000) },
+      {
+        name: name,
+        email: email,
+        phone: phone,
+        subject: `[Contact Form] ${subject}`,
+        message: message
+      }
+    );
 
     if (response.success) {
       // Open clean modal to display success message
@@ -368,14 +670,10 @@ document.addEventListener('DOMContentLoaded', () => {
           <div style="font-size: 3.5rem; margin-bottom: 1.5rem;">✉️</div>
           <h3 class="modal-title" style="margin-bottom: 1rem;">Message Sent Successfully!</h3>
           <p class="modal-description" style="margin-bottom: 2rem;">
-            Thank you, <strong>${name}</strong>, for reaching out to Little Crew & Co regarding <strong>${subject}</strong>. 
-            We have registered your request and will respond to <strong>${email}</strong> within 24 hours.
+            Thank you, <strong>${escapeHtml(name)}</strong>, for reaching out to Little Crew & Co regarding <strong>${escapeHtml(subject)}</strong>.
+            We have registered your request and will respond to <strong>${escapeHtml(email)}</strong> within 24 hours.
           </p>
-          ${response.isDemo ? `
-            <div style="margin: -1rem auto 2rem auto; padding: 0.75rem; border-radius: 8px; background: rgba(168,85,247,0.15); border: 1px dashed #a855f7; max-width: 400px; font-size: 0.85rem; color: #d8b4fe; line-height: 1.4;">
-              <strong>🔧 Developer Demo Mode:</strong> To receive actual emails, configure your Web3Forms access key in the <code>app.js</code> file.
-            </div>
-          ` : ''}
+          ${demoNotice(response.isDemo)}
           <button class="btn btn-primary" id="modalConfirmDone">Continue</button>
         </div>
       `;

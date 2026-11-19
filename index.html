@@ -66,18 +66,18 @@
   <section class="hero-section" id="hero">
     <div class="container hero-container">
       <div class="hero-content">
-        <div class="badge">Limitless Possibilities</div>
-        <h1 class="hero-title">
+        <div class="badge" data-cms="hero.badge" data-cms-label="Small badge above title">Limitless Possibilities</div>
+        <h1 class="hero-title" data-cms="hero.title" data-cms-label="Main title" data-cms-rich="gradient-text">
           Creating <span class="gradient-text">Experiences.</span><br>
           Building <span class="gradient-text">Brands.</span><br>
           Driving <span class="gradient-text">Growth.</span>
         </h1>
-        <p class="hero-subtitle">
+        <p class="hero-subtitle" data-cms="hero.subtitle" data-cms-label="Subtitle">
           At Little Crew & Co, we don't just deliver services — we create impact. Explore what we can do for you.
         </p>
         <div class="hero-actions">
-          <a href="#services" class="btn btn-primary">Explore Services</a>
-          <a href="#events" class="btn btn-outline">Upcoming Events</a>
+          <a href="#services" class="btn btn-primary" data-cms="hero.button1" data-cms-label="Button 1 text">Explore Services</a>
+          <a href="#events" class="btn btn-outline" data-cms="hero.button2" data-cms-label="Button 2 text">Upcoming Events</a>
         </div>
       </div>
       <div class="hero-visual">
@@ -101,38 +101,38 @@
       <div class="about-grid">
         <div class="about-visual-box">
           <div class="glass-card visual-card">
-            <h3 class="visual-card-title">Inspire creativity, innovate together!</h3>
-            <p class="visual-card-desc">We work closely with brands, businesses, and creators to help them stand out in
+            <h3 class="visual-card-title" data-cms="about.card_title" data-cms-label="Card title">Inspire creativity, innovate together!</h3>
+            <p class="visual-card-desc" data-cms="about.card_desc" data-cms-label="Card text">We work closely with brands, businesses, and creators to help them stand out in
               a competitive world.</p>
             <div class="visual-card-stats">
               <div class="stat-item">
-                <span class="stat-num" data-val="100">0</span><span class="stat-plus">%</span>
-                <span class="stat-label">Creativity</span>
+                <span class="stat-num" data-val="100" data-cms="about.stat1_value" data-cms-label="Stat 1 number" data-cms-attr="data-val">0</span><span class="stat-plus" data-cms="about.stat1_suffix" data-cms-label="Stat 1 symbol">%</span>
+                <span class="stat-label" data-cms="about.stat1_label" data-cms-label="Stat 1 label">Creativity</span>
               </div>
               <div class="stat-item">
-                <span class="stat-num" data-val="50">0</span><span class="stat-plus">+</span>
-                <span class="stat-label">Projects</span>
+                <span class="stat-num" data-val="50" data-cms="about.stat2_value" data-cms-label="Stat 2 number" data-cms-attr="data-val">0</span><span class="stat-plus" data-cms="about.stat2_suffix" data-cms-label="Stat 2 symbol">+</span>
+                <span class="stat-label" data-cms="about.stat2_label" data-cms-label="Stat 2 label">Projects</span>
               </div>
             </div>
           </div>
         </div>
 
         <div class="about-content">
-          <h2 class="section-title">Little Crew & Co</h2>
+          <h2 class="section-title" data-cms="about.heading" data-cms-label="Heading">Little Crew & Co</h2>
           <div class="section-accent-bar"></div>
 
           <div class="about-text-content">
-            <p class="lead-text">
+            <p class="lead-text" data-cms="about.para1" data-cms-label="Paragraph 1">
               At Little Crew & Co, we don't just deliver services — we create impact. We are a modern media and events
               agency focused on bringing ideas to life through powerful visuals, strategic marketing, and unforgettable
               experiences.
             </p>
-            <p>
+            <p data-cms="about.para2" data-cms-label="Paragraph 2">
               From high-quality media production to dynamic event hosting and results-driven social media strategies,
               our team works closely with brands, businesses, and creators to help them stand out in a competitive
               world.
             </p>
-            <p>
+            <p data-cms="about.para3" data-cms-label="Paragraph 3">
               Whether you're launching a new concept, growing your audience, or hosting a large-scale event, we bring
               creativity, precision, and innovation to every project.
             </p>
@@ -140,17 +140,17 @@
 
           <div class="about-highlights">
             <div class="highlight-item">
-              <div class="highlight-icon">⚡</div>
+              <div class="highlight-icon" data-cms="about.hl1_icon" data-cms-label="Highlight 1 icon">⚡</div>
               <div class="highlight-text">
-                <h4>Creative Precision</h4>
-                <p>Every detail is designed to align with your brand's unique identity.</p>
+                <h4 data-cms="about.hl1_title" data-cms-label="Highlight 1 title">Creative Precision</h4>
+                <p data-cms="about.hl1_text" data-cms-label="Highlight 1 text">Every detail is designed to align with your brand's unique identity.</p>
               </div>
             </div>
             <div class="highlight-item">
-              <div class="highlight-icon">🔥</div>
+              <div class="highlight-icon" data-cms="about.hl2_icon" data-cms-label="Highlight 2 icon">🔥</div>
               <div class="highlight-text">
-                <h4>Impact Focused</h4>
-                <p>We craft campaigns and event setups aimed at real, measurable growth.</p>
+                <h4 data-cms="about.hl2_title" data-cms-label="Highlight 2 title">Impact Focused</h4>
+                <p data-cms="about.hl2_text" data-cms-label="Highlight 2 text">We craft campaigns and event setups aimed at real, measurable growth.</p>
               </div>
             </div>
           </div>
@@ -169,21 +169,21 @@
         <!-- Card 1: Why Choose Us -->
         <div class="glass-card"
           style="padding: 2.5rem; display: flex; flex-direction: column; gap: 1.5rem; border-color: rgba(255, 255, 255, 0.05); height: 100%;">
-          <div style="font-size: 2.5rem; display: inline-block; filter: drop-shadow(0 0 10px rgba(168,85,247,0.3));">🎯
+          <div style="font-size: 2.5rem; display: inline-block; filter: drop-shadow(0 0 10px rgba(168,85,247,0.3));" data-cms="approach.card1_icon" data-cms-label="Card 1 icon">🎯
           </div>
           <h3
-            style="font-family: var(--font-display); font-size: 1.8rem; font-weight: 700; color: white; letter-spacing: -0.02em;">
+            style="font-family: var(--font-display); font-size: 1.8rem; font-weight: 700; color: white; letter-spacing: -0.02em;" data-cms="approach.card1_title" data-cms-label="Card 1 title">
             Why Choose Little Crew & Co?</h3>
           <div style="height: 3px; width: 40px; background: var(--gradient-primary); border-radius: 2px;"></div>
-          <p style="color: var(--text-muted); line-height: 1.7; font-size: 0.95rem;">
+          <p style="color: var(--text-muted); line-height: 1.7; font-size: 0.95rem;" data-cms="approach.card1_text" data-cms-label="Card 1 text">
             We don’t believe in one-size-fits-all marketing. Every business has a unique story, and our role is to help
             you tell that story in a way that attracts attention, builds trust, and drives growth.
           </p>
           <p
-            style="color: white; font-weight: 600; font-family: var(--font-display); line-height: 1.6; margin-top: auto; font-size: 1.05rem; background: var(--gradient-primary); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+            style="color: white; font-weight: 600; font-family: var(--font-display); line-height: 1.6; margin-top: auto; font-size: 1.05rem; background: var(--gradient-primary); -webkit-background-clip: text; -webkit-text-fill-color: transparent;" data-cms="approach.card1_highlight" data-cms-label="Card 1 highlighted line">
             Creative Thinking. Strategic Planning. Digital Impact.
           </p>
-          <p style="color: var(--text-muted); font-size: 0.9rem; font-style: italic;">
+          <p style="color: var(--text-muted); font-size: 0.9rem; font-style: italic;" data-cms="approach.card1_note" data-cms-label="Card 1 small note">
             Little Crew & Co helps brands move from being noticed to being remembered.
           </p>
         </div>
@@ -191,22 +191,22 @@
         <!-- Card 2: Our Approach -->
         <div class="glass-card"
           style="padding: 2.5rem; display: flex; flex-direction: column; gap: 1.5rem; border-color: rgba(255, 255, 255, 0.05); height: 100%;">
-          <div style="font-size: 2.5rem; display: inline-block; filter: drop-shadow(0 0 10px rgba(168,85,247,0.3));">⚡
+          <div style="font-size: 2.5rem; display: inline-block; filter: drop-shadow(0 0 10px rgba(168,85,247,0.3));" data-cms="approach.card2_icon" data-cms-label="Card 2 icon">⚡
           </div>
           <h3
-            style="font-family: var(--font-display); font-size: 1.8rem; font-weight: 700; color: white; letter-spacing: -0.02em;">
+            style="font-family: var(--font-display); font-size: 1.8rem; font-weight: 700; color: white; letter-spacing: -0.02em;" data-cms="approach.card2_title" data-cms-label="Card 2 title">
             Our Approach</h3>
           <div style="height: 3px; width: 40px; background: var(--gradient-primary); border-radius: 2px;"></div>
-          <p style="color: var(--text-muted); line-height: 1.7; font-size: 0.95rem;">
+          <p style="color: var(--text-muted); line-height: 1.7; font-size: 0.95rem;" data-cms="approach.card2_text" data-cms-label="Card 2 text">
             Every project we take on is guided by a simple principle — deliver value that goes beyond expectations. We
             combine creative thinking with strategic execution to ensure every solution we provide contributes to your
             long-term success.
           </p>
           <p
-            style="color: white; font-weight: 600; font-family: var(--font-display); line-height: 1.6; margin-top: auto; font-size: 1.05rem; background: var(--gradient-primary); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+            style="color: white; font-weight: 600; font-family: var(--font-display); line-height: 1.6; margin-top: auto; font-size: 1.05rem; background: var(--gradient-primary); -webkit-background-clip: text; -webkit-text-fill-color: transparent;" data-cms="approach.card2_highlight" data-cms-label="Card 2 highlighted line">
             With Little Crew & Co, you don’t just get a service — you gain a creative partner committed to your growth.
           </p>
-          <p style="color: var(--text-muted); font-size: 0.9rem; font-style: italic;">
+          <p style="color: var(--text-muted); font-size: 0.9rem; font-style: italic;" data-cms="approach.card2_note" data-cms-label="Card 2 small note">
             We focus on delivering visual excellence and strategic clarity.
           </p>
         </div>
@@ -219,8 +219,8 @@
   <section class="services-section id-anchor" id="services">
     <div class="container">
       <div class="section-header text-center">
-        <h2 class="section-title">Our Solutions</h2>
-        <p class="section-subtitle" style="max-width: 850px; margin: 0 auto;">
+        <h2 class="section-title" data-cms="services.heading" data-cms-label="Heading">Our Solutions</h2>
+        <p class="section-subtitle" style="max-width: 850px; margin: 0 auto;" data-cms="services.intro" data-cms-label="Intro text">
           At Little Crew & Co, we combine creativity, strategy, and execution to deliver solutions that don’t just look
           impressive — they perform. We operate at the intersection of media, marketing, and experience design, helping
           brands build visibility, credibility, and long-term growth.
@@ -237,13 +237,13 @@
                 stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
             </svg>
           </div>
-          <h3 class="service-card-title">Media Production</h3>
-          <p class="service-card-desc">
+          <h3 class="service-card-title" data-cms="services.s1_title" data-cms-label="Service 1 title">Media Production</h3>
+          <p class="service-card-desc" data-cms="services.s1_text" data-cms-label="Service 1 text">
             We produce high-quality visual content that captures attention and tells your story. Our team specialises in
             professional video editing, creative content production, brand videos, event highlights, social media reels,
             and digital campaigns, transforming ideas into engaging visuals.
           </p>
-          <div class="service-card-tag">Visuals & Video</div>
+          <div class="service-card-tag" data-cms="services.s1_tag" data-cms-label="Service 1 tag">Visuals & Video</div>
         </div>
 
         <!-- Service 2: Event Hosting & Management -->
@@ -255,12 +255,12 @@
                 stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
             </svg>
           </div>
-          <h3 class="service-card-title">Event Hosting & Management</h3>
-          <p class="service-card-desc">
+          <h3 class="service-card-title" data-cms="services.s2_title" data-cms-label="Service 2 title">Event Hosting & Management</h3>
+          <p class="service-card-desc" data-cms="services.s2_text" data-cms-label="Service 2 text">
             We design and deliver seamless, engaging events tailored to your audience. From corporate gatherings to
             creative showcases, we manage everything from concept to execution.
           </p>
-          <div class="service-card-tag">Experiential</div>
+          <div class="service-card-tag" data-cms="services.s2_tag" data-cms-label="Service 2 tag">Experiential</div>
         </div>
 
         <!-- Service 3: Social Media Marketing -->
@@ -272,12 +272,12 @@
                 stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
             </svg>
           </div>
-          <h3 class="service-card-title">Social Media Marketing</h3>
-          <p class="service-card-desc">
+          <h3 class="service-card-title" data-cms="services.s3_title" data-cms-label="Service 3 title">Social Media Marketing</h3>
+          <p class="service-card-desc" data-cms="services.s3_text" data-cms-label="Service 3 text">
             We create structured growth plans for platforms including Instagram, Facebook, LinkedIn, and TikTok to
             increase engagement, build a loyal audience, and drive digital growth through targeted campaigns.
           </p>
-          <div class="service-card-tag">Growth & Digital</div>
+          <div class="service-card-tag" data-cms="services.s3_tag" data-cms-label="Service 3 tag">Growth & Digital</div>
         </div>
 
         <!-- Service 4: Brand Strategy & Positioning -->
@@ -292,12 +292,12 @@
                 stroke-linejoin="round" />
             </svg>
           </div>
-          <h3 class="service-card-title">Brand Strategy & Positioning</h3>
-          <p class="service-card-desc">
+          <h3 class="service-card-title" data-cms="services.s4_title" data-cms-label="Service 4 title">Brand Strategy & Positioning</h3>
+          <p class="service-card-desc" data-cms="services.s4_text" data-cms-label="Service 4 text">
             We help define your brand voice, message, and identity to ensure you stand out in a competitive marketplace.
             From creative concepts to campaign execution, we keep your brand visible and memorable.
           </p>
-          <div class="service-card-tag">Identity</div>
+          <div class="service-card-tag" data-cms="services.s4_tag" data-cms-label="Service 4 tag">Identity</div>
         </div>
 
         <!-- Service 5: Business Development Ideas -->
@@ -308,12 +308,12 @@
                 stroke-linejoin="round" />
             </svg>
           </div>
-          <h3 class="service-card-title">Business Development Ideas</h3>
-          <p class="service-card-desc">
+          <h3 class="service-card-title" data-cms="services.s5_title" data-cms-label="Service 5 title">Business Development Ideas</h3>
+          <p class="service-card-desc" data-cms="services.s5_text" data-cms-label="Service 5 text">
             We help businesses identify new opportunities, improve performance, and scale effectively with innovative
             and practical growth solutions.
           </p>
-          <div class="service-card-tag">Strategy & Scaling</div>
+          <div class="service-card-tag" data-cms="services.s5_tag" data-cms-label="Service 5 tag">Strategy & Scaling</div>
         </div>
 
         <!-- Service 6: Marketing Strategies -->
@@ -324,17 +324,17 @@
                 stroke-linejoin="round" />
             </svg>
           </div>
-          <h3 class="service-card-title">Marketing Strategies</h3>
-          <p class="service-card-desc">
+          <h3 class="service-card-title" data-cms="services.s6_title" data-cms-label="Service 6 title">Marketing Strategies</h3>
+          <p class="service-card-desc" data-cms="services.s6_text" data-cms-label="Service 6 text">
             We develop tailored marketing plans based on market insights. We understand your goals, audience, and market
             position before creating a customized strategic marketing approach designed to deliver meaningful results.
           </p>
-          <div class="service-card-tag">Consulting</div>
+          <div class="service-card-tag" data-cms="services.s6_tag" data-cms-label="Service 6 tag">Consulting</div>
         </div>
       </div>
 
       <div class="services-quote-container text-center">
-        <p class="services-quote">
+        <p class="services-quote" data-cms="services.quote" data-cms-label="Quote (put *stars* around the glowing part)" data-cms-rich="glow-text">
           "Every service we offer is built around one goal — <span class="glow-text">helping you grow with
             confidence.</span>"
         </p>
@@ -346,22 +346,22 @@
   <section class="events-section id-anchor" id="events">
     <div class="container">
       <div class="section-header text-center">
-        <div class="badge">Live & Unforgettable</div>
-        <h2 class="section-title">Upcoming <span class="gradient-text">Events</span></h2>
-        <p class="section-subtitle">Join us for extraordinary performances, live concerts, and vibrant celebrations</p>
+        <div class="badge" data-cms="events.badge" data-cms-label="Small badge">Live & Unforgettable</div>
+        <h2 class="section-title" data-cms="events.heading" data-cms-label="Heading" data-cms-rich="gradient-text">Upcoming <span class="gradient-text">Events</span></h2>
+        <p class="section-subtitle" data-cms="events.subtitle" data-cms-label="Subtitle">Join us for extraordinary performances, live concerts, and vibrant celebrations</p>
       </div>
 
       <!-- Events Filter Tabs -->
       <div class="events-filter-wrapper">
         <div class="events-filter">
           <button class="filter-btn active" data-filter="all">All Events</button>
-          <button class="filter-btn" data-filter="upcoming">Upcoming Events (3)</button>
-          <button class="filter-btn" data-filter="past">Past Events (1)</button>
+          <button class="filter-btn" data-filter="upcoming">Upcoming Events (<span id="upcomingCount">3</span>)</button>
+          <button class="filter-btn" data-filter="past">Past Events (<span id="pastCount">1</span>)</button>
         </div>
       </div>
 
       <!-- Upcoming Events Grid -->
-      <div class="events-grid upcoming-grid">
+      <div class="events-grid upcoming-grid" id="upcomingGrid">
 
         <!-- Event 1: Anarkali Marikar Live Music Show -->
         <div class="event-card glass-card" data-category="upcoming">
@@ -476,11 +476,11 @@
       <!-- Past Events Sub-section -->
       <div class="past-events-section" id="pastEventsBlock">
         <div class="section-header text-center" style="margin-bottom: 2.5rem;">
-          <h3 class="past-events-heading">Past <span class="gradient-text">Events</span></h3>
-          <p class="section-subtitle">Moments and memories from our celebrated gatherings</p>
+          <h3 class="past-events-heading" data-cms="events.past_heading" data-cms-label="Past events heading" data-cms-rich="gradient-text">Past <span class="gradient-text">Events</span></h3>
+          <p class="section-subtitle" data-cms="events.past_subtitle" data-cms-label="Past events subtitle">Moments and memories from our celebrated gatherings</p>
         </div>
 
-        <div class="events-grid past-grid" style="display: flex; justify-content: center;">
+        <div class="events-grid past-grid" id="pastGrid" style="display: flex; justify-content: center; flex-wrap: wrap; gap: 2rem;">
           <!-- Event: Tun Fun Nights (Past Event) -->
           <div class="event-card glass-card past-event-card" data-category="past"
             style="max-width: 520px; width: 100%;">
@@ -526,12 +526,12 @@
     <div class="container">
       <div class="contact-grid">
         <div class="contact-info-panel">
-          <h2 class="section-title">Let's Build Something Amazing Together</h2>
-          <p class="contact-intro">
+          <h2 class="section-title" data-cms="contact.heading" data-cms-label="Heading">Let's Build Something Amazing Together</h2>
+          <p class="contact-intro" data-cms="contact.intro" data-cms-label="Intro text">
             We're always ready to collaborate, create, and grow with you. Whether you have a project in mind, need
             support with your business strategy, or want to plan your next event, our team is here to help.
           </p>
-          <p class="contact-cta-highlight">
+          <p class="contact-cta-highlight" data-cms="contact.highlight" data-cms-label="Highlighted line">
             Get in touch with us today and let's start turning your ideas into reality.
           </p>
 
@@ -540,21 +540,21 @@
               <div class="detail-icon">✉️</div>
               <div class="detail-content">
                 <span class="detail-label">Email</span>
-                <a href="mailto:hello@littlecrewco.com" class="detail-value">hello@littlecrewco.com</a>
+                <a href="mailto:hello@littlecrewco.com" class="detail-value" data-cms="contact.email" data-cms-label="Email address" data-cms-href="mailto:">hello@littlecrewco.com</a>
               </div>
             </div>
             <div class="contact-detail-item">
               <div class="detail-icon">📞</div>
               <div class="detail-content">
                 <span class="detail-label">Phone</span>
-                <a href="tel:+447388890443" class="detail-value">+44 7388 890 443</a>
+                <a href="tel:+447388890443" class="detail-value" data-cms="contact.phone" data-cms-label="Phone number" data-cms-href="tel:">+44 7388 890 443</a>
               </div>
             </div>
             <div class="contact-detail-item">
               <div class="detail-icon">📍</div>
               <div class="detail-content">
                 <span class="detail-label">Location</span>
-                <span class="detail-value">Tunbridge Wells, Kent, United Kingdom</span>
+                <span class="detail-value" data-cms="contact.location" data-cms-label="Location">Tunbridge Wells, Kent, United Kingdom</span>
               </div>
             </div>
           </div>
@@ -597,6 +597,9 @@
                 placeholder="Tell us about your project or event details..."></textarea>
             </div>
 
+            <!-- Spam trap: real visitors never see or fill this -->
+            <input type="text" name="website" id="form_website" tabindex="-1" autocomplete="off" aria-hidden="true"
+              style="position:absolute; left:-9999px; width:1px; height:1px; opacity:0;">
             <button type="submit" class="btn btn-primary btn-block">Send Message 🚀</button>
           </form>
         </div>
@@ -607,14 +610,14 @@
         <div class="footer-content">
           <div class="footer-brand">
             <img src="assets/logo.png" alt="Little Crew Logo" class="footer-logo">
-            <p class="footer-tagline">Limitless Possibilities..</p>
+            <p class="footer-tagline" data-cms="footer.tagline" data-cms-label="Tagline under logo">Limitless Possibilities..</p>
           </div>
           <div class="footer-phrase">
-            <span class="phrase-text">Inspire creativity, innovate together!</span>
+            <span class="phrase-text" data-cms="footer.phrase" data-cms-label="Phrase">Inspire creativity, innovate together!</span>
           </div>
         </div>
         <div class="footer-bottom">
-          <p>&copy; 2026 Little Crew & Co. All rights reserved.</p>
+          <p data-cms="footer.copyright" data-cms-label="Copyright line">&copy; 2026 Little Crew & Co. All rights reserved.</p>
         </div>
       </footer>
     </div>
@@ -631,7 +634,8 @@
   </div>
 
   <!-- Script File -->
-  <script src="app.js?v=1.3"></script>
+  <script src="cms-config.js?v=1"></script>
+  <script src="app.js?v=2.0"></script>
 </body>
 
 </html>
