@@ -59,6 +59,7 @@ create table if not exists public.events (
   tagline text,
   summary text,
   image_url text,
+  banner_image_url text,   -- optional wide ad image for the top banner slider (1920x1080)
   date_day text,
   date_month text,
   date_year text,
@@ -112,6 +113,7 @@ create table if not exists public.submissions (
 
 -- Upgrades for databases created with an earlier version of this file
 alter table public.events add column if not exists featured boolean not null default false;
+alter table public.events add column if not exists banner_image_url text;
 alter table public.events add column if not exists booking_mode text not null default 'enquiry'
   check (booking_mode in ('tickets', 'waitlist', 'enquiry'));
 update public.events set booking_mode = 'tickets' where booking_url is not null and booking_mode = 'enquiry';

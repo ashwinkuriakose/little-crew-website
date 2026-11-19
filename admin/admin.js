@@ -412,7 +412,7 @@
   let events = [];
   let editingId = null;
 
-  const EVENT_FIELDS = ['title', 'category', 'image_url', 'date_day', 'date_month', 'date_year', 'status_pill',
+  const EVENT_FIELDS = ['title', 'category', 'image_url', 'banner_image_url', 'date_day', 'date_month', 'date_year', 'status_pill',
     'pill_style', 'time_label', 'location', 'tagline', 'summary', 'booking_mode', 'booking_url', 'phone',
     'details_title', 'details_time', 'details_location', 'artist', 'description', 'cta_text'];
 
@@ -420,8 +420,15 @@
     $('#eventAdd').addEventListener('click', () => openEventForm(null));
     $('#eventForm').addEventListener('submit', saveEvent);
     $('#eventForm').booking_mode.addEventListener('change', syncBookingFields);
-    $('#eventForm').image_url.addEventListener('input', e => updateImagePreview(e.target.value));
-    $('#eventImageFile').addEventListener('change', uploadEventImage);
+    IMAGE_PICKERS.forEach(picker => {
+      $('#eventForm')[picker.field].addEventListener('input', e => updatePreview(picker, e.target.value));
+      $(picker.file).addEventListener('change', e => uploadImage(e, picker));
+    });
+    $('#bannerImageClear').addEventListener('click', () => {
+      const picker = IMAGE_PICKERS[1];
+      $('#eventForm')[picker.field].value = '';
+      updatePreview(picker, '');
+    });
     $('#eventList').addEventListener('click', onEventListClick);
     $('#eventList').addEventListener('change', async e => {
       const toggle = e.target.closest('input[data-publish], input[data-feature]');
@@ -559,11 +566,55 @@
     if (err) { fail(err.error, 'Could not save order'); loadEvents(); }
   }
 
-  function updateImagePreview(url) {
-    $('#eventImagePreview').innerHTML = url
-      ? `<img src="${esc(siteUrl(url))}" alt="Poster preview">`
-      : '<span class="muted">No image</span>';
+  const IMAGE_PICKERS = [
+    { field: 'image_url', file: '#eventImageFile', preview: '#eventImagePreview', status: '#eventImageStatus', name: 'poster', empty: 'No image' },
+    { field: 'banner_image_url', file: '#bannerImageFile', preview: '#bannerImagePreview', status: '#bannerImageStatus', name: 'banner', empty: 'No banner image — the poster is used instead', checkSize: true }
+  ];
+
+  function updatePreview(picker, url) {
+    const box = $(picker.preview);
+    if (!url) {
+      box.innerHTML = `<span class="muted">${esc(picker.empty)}</span>`;
+      if (picker.checkSize) $(picker.status).textContent = '';
+      return;
+    }
+    box.innerHTML = `<img src="${esc(siteUrl(url))}" alt="Preview">`;
+    if (picker.checkSize) {
+      const img = box.querySelector('img');
+      img.addEventListener('load', () => {
+        const w = img.naturalWidth, h = img.naturalHeight;
+        const ratio = w / h;
+        const status = $(picker.status);
+        const prefix = picker.justUploaded ? 'Uploaded ✓ (remember to save the event) · ' : '';
+        picker.justUploaded = false;
+        const notes = [];
+        if (Math.abs(ratio - 16 / 9) > 0.12) notes.push('not 16:9, so it will be cropped');
+        if (w < 1600) notes.push('a bit small, so it may look blurry on big screens');
+        status.textContent = prefix + `${w} × ${h} px` + (notes.length ? ` — ${notes.join('; ')}.` : ' ✓ good size');
+        status.classList.toggle('warn', notes.length > 0);
+      }, { once: true });
+    }
   }
+
+  async function uploadImage(e, picker) {
+    const file = e.target.files[0];
+    if (!file) return;
+    const status = $(picker.status);
+    if (file.size > 8 * 1024 * 1024) { status.textContent = 'Image is too large (max 8 MB).'; return; }
+    status.textContent = 'Uploading…';
+    const ext = (file.name.split('.').pop() || 'jpg').toLowerCase().replace(/[^a-z0-9]/g, '');
+    const base = file.name.replace(/\.[^.]+$/, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').slice(0, 40) || picker.name;
+    const path = `events/${Date.now()}-${base}.${ext}`;
+    const { error } = await sb.storage.from(BUCKET).upload(path, file, { cacheControl: '31536000', upsert: false, contentType: file.type });
+    e.target.value = '';
+    if (error) { status.textContent = ''; fail(error, 'Upload failed'); return; }
+    const { data } = sb.storage.from(BUCKET).getPublicUrl(path);
+    $('#eventForm')[picker.field].value = data.publicUrl;
+    status.textContent = 'Uploaded ✓ — remember to save the event.';
+    picker.justUploaded = true;
+    updatePreview(picker, data.publicUrl);
+  }
+
 
   function openEventForm(id) {
     editingId = id;
@@ -580,27 +631,9 @@
     form.published.checked = !!ev.published;
     form.featured.checked = !!ev.featured;
     form.badges.value = (ev.badges || []).join('\n');
-    updateImagePreview(ev.image_url);
+    IMAGE_PICKERS.forEach(picker => { $(picker.status).textContent = ''; updatePreview(picker, ev[picker.field]); });
     openDrawer('eventDrawer');
     form.title.focus();
-  }
-
-  async function uploadEventImage(e) {
-    const file = e.target.files[0];
-    if (!file) return;
-    if (file.size > 8 * 1024 * 1024) { $('#eventImageStatus').textContent = 'Image is too large (max 8 MB).'; return; }
-    const status = $('#eventImageStatus');
-    status.textContent = 'Uploading…';
-    const ext = (file.name.split('.').pop() || 'jpg').toLowerCase().replace(/[^a-z0-9]/g, '');
-    const base = file.name.replace(/\.[^.]+$/, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').slice(0, 40) || 'poster';
-    const path = `events/${Date.now()}-${base}.${ext}`;
-    const { error } = await sb.storage.from(BUCKET).upload(path, file, { cacheControl: '31536000', upsert: false, contentType: file.type });
-    e.target.value = '';
-    if (error) { status.textContent = ''; fail(error, 'Upload failed'); return; }
-    const { data } = sb.storage.from(BUCKET).getPublicUrl(path);
-    $('#eventForm').image_url.value = data.publicUrl;
-    updateImagePreview(data.publicUrl);
-    status.textContent = 'Uploaded ✓ — remember to save the event.';
   }
 
   async function saveEvent(e) {

@@ -456,10 +456,26 @@ document.addEventListener('DOMContentLoaded', () => {
       actions = `<button class="btn btn-ticket open-event-modal" data-event-id="${id}">Enquire now</button>`;
     }
 
+    const banner = safeUrl(ev.banner_image_url);
+    const cssUrl = url => `url('${escapeHtml(url.replace(/'/g, '%27'))}')`;
+
+    // With a banner ad image: it fills the slide behind the text (on phones it shows above the text).
+    // Without one: blurred poster backdrop with the poster card on the right.
+    const media = banner
+      ? `<div class="slide-banner-bg" style="background-image:${cssUrl(banner)}"></div>`
+      : (img ? `<div class="slide-backdrop" style="background-image:${cssUrl(img)}"></div>` : '');
+    const bannerImg = banner
+      ? `<img class="slide-banner-img open-event-modal" data-event-id="${id}" src="${escapeHtml(banner)}" alt="${escapeHtml(ev.title)}">`
+      : '';
+    const posterCard = !banner && img
+      ? `<div class="slide-poster open-event-modal" data-event-id="${id}" title="View event details"><img src="${escapeHtml(img)}" alt="${escapeHtml(ev.title)} poster"></div>`
+      : '';
+
     return `
-      <div class="hero-slide hero-slide-event" role="group" aria-roledescription="slide" aria-label="${escapeHtml(ev.title)}">
-        ${img ? `<div class="slide-backdrop" style="background-image:url('${escapeHtml(img.replace(/'/g, '%27'))}')"></div>` : ''}
+      <div class="hero-slide hero-slide-event${banner ? ' has-banner' : ''}" role="group" aria-roledescription="slide" aria-label="${escapeHtml(ev.title)}">
+        ${media}
         <div class="container slide-event-inner">
+          ${bannerImg}
           <div class="slide-copy">
             ${ev.status_pill ? `<p class="slide-kicker">${escapeHtml(ev.status_pill)}</p>` : ''}
             <h2 class="slide-title">${escapeHtml(ev.title)}</h2>
@@ -468,7 +484,7 @@ document.addEventListener('DOMContentLoaded', () => {
             ${ev.summary ? `<p class="slide-summary">${escapeHtml(ev.summary)}</p>` : ''}
             <div class="slide-actions">${actions}</div>
           </div>
-          ${img ? `<div class="slide-poster open-event-modal" data-event-id="${id}" title="View event details"><img src="${escapeHtml(img)}" alt="${escapeHtml(ev.title)} poster"></div>` : ''}
+          ${posterCard}
         </div>
       </div>`;
   }
