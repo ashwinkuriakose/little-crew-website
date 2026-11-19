@@ -265,15 +265,15 @@
     $('#subBody').innerHTML = rows.map(s => `
       <tr data-id="${esc(s.id)}" class="${s.status === 'new' ? 'is-new' : ''}">
         <td class="col-check"><input type="checkbox" data-id="${esc(s.id)}" ${selected.has(s.id) ? 'checked' : ''} aria-label="Select"></td>
-        <td class="cell-nowrap">${esc(formatDate(s.created_at))}</td>
-        <td><span class="tag tag-${esc(s.form)}">${esc(formLabel(s.form))}</span></td>
-        <td>${esc(s.name)}</td>
-        <td>${esc(s.email)}</td>
-        <td class="cell-nowrap">${esc(s.phone || '')}</td>
-        <td class="cell-nowrap">${esc(s.postcode || '')}</td>
-        <td>${esc(subjectOf(s))}</td>
-        <td><div class="cell-msg">${esc(s.message || '')}</div></td>
-        <td><span class="tag tag-${esc(s.status)}">${esc(s.status)}</span></td>
+        <td class="cell-nowrap" data-label="Date">${esc(formatDate(s.created_at))}</td>
+        <td data-label="Form"><span class="tag tag-${esc(s.form)}">${esc(formLabel(s.form))}</span></td>
+        <td class="cell-name">${esc(s.name)}</td>
+        <td data-label="Email">${esc(s.email)}</td>
+        <td class="cell-nowrap" data-label="Phone">${esc(s.phone || '')}</td>
+        <td class="cell-nowrap" data-label="Postcode">${esc(s.postcode || '')}</td>
+        <td data-label="${s.form === 'contact' ? 'Subject' : 'Event'}">${esc(subjectOf(s))}</td>
+        <td data-label="Message"><div class="cell-msg">${esc(s.message || '')}</div></td>
+        <td data-label="Status"><span class="tag tag-${esc(s.status)}">${esc(s.status)}</span></td>
       </tr>`).join('');
 
     $('#subEmpty').classList.toggle('hidden', rows.length > 0);
