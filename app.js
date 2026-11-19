@@ -105,7 +105,15 @@ function saveFailedMessage() {
 // Saves the form to the database (what the admin panel shows) and then sends
 // the email notification. When the database is connected, the form only counts
 // as sent once the database save works — so nothing can silently go missing.
-async function submitForm(record, emailData) {
+// `suspicious` = the hidden spam-trap field was filled. That can be a bot, but
+// browser AutoFill sometimes fills it too, so the entry is still saved (marked
+// for review) instead of being thrown away; only the email is skipped.
+async function submitForm(record, emailData, suspicious = false) {
+  if (suspicious) {
+    record = { ...record, subject: `[Possible spam] ${record.subject || ''}`.slice(0, 300) };
+    emailData = { ...emailData, subject: `[Possible spam] ${emailData.subject || ''}` };
+  }
+
   if (DB_ENABLED) {
     try {
       await saveSubmission(record);
@@ -113,6 +121,7 @@ async function submitForm(record, emailData) {
       console.error('Could not save form to the database:', error);
       return { success: false, message: saveFailedMessage() };
     }
+    if (suspicious) return { success: true };
     // Saved: the email is a bonus notification, so its result doesn't change the outcome
     sendToWeb3Forms(emailData).then(mail => {
       if (!mail.success && !mail.skipped) console.warn('Email notification failed:', mail.message);
@@ -511,7 +520,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function modalActionHtml(data) {
     const mode = data.mode || (data.bookingUrl ? 'tickets' : 'enquiry');
-    const honeypot = '<input type="text" id="booking_website" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute; left:-9999px; width:1px; height:1px; opacity:0;">';
+    // Spam trap: display:none keeps it away from people, screen readers and AutoFill
+    const honeypot = '<div class="trap-wrap" aria-hidden="true"><input type="text" id="booking_website" name="lc_extra_field" tabindex="-1" autocomplete="off"></div>';
 
     if (mode === 'tickets' && data.bookingUrl) {
       return `
@@ -605,7 +615,7 @@ document.addEventListener('DOMContentLoaded', () => {
     submitBtn.innerHTML = 'Sending... ⏳';
 
     const details = `Time: ${data.time || '-'}\nLocation: ${data.location || '-'}`;
-    const response = isBot ? { success: true } : await submitForm(
+    const response = await submitForm(
       isWaitlist
         ? { form: 'waitlist', name, email, phone, postcode, subject: `Waitlist: ${data.title}`.slice(0, 300), event_title: data.title.slice(0, 300), message: details }
         : { form: 'booking', name, email, subject: `Event enquiry: ${data.title}`.slice(0, 300), event_title: data.title.slice(0, 300), message: details },
@@ -619,7 +629,8 @@ document.addEventListener('DOMContentLoaded', () => {
           name, email,
           subject: `[Event Booking] ${data.title}`,
           message: `Booking request details:\n- Event: ${data.title}\n- Time: ${data.time}\n- Location: ${data.location}\n- Client Email: ${email}`
-        }
+        },
+      isBot
     );
 
     if (response.success) {
@@ -688,7 +699,7 @@ document.addEventListener('DOMContentLoaded', () => {
     contactSubmitBtn.disabled = true;
     contactSubmitBtn.innerHTML = 'Sending... ⏳';
 
-    const response = isBot ? { success: true } : await submitForm(
+    const response = await submitForm(
       { form: 'contact', name, email, phone: phone || null, subject, message: message.slice(0, 5000) },
       {
         name: name,
@@ -696,7 +707,8 @@ document.addEventListener('DOMContentLoaded', () => {
         phone: phone,
         subject: `[Contact Form] ${subject}`,
         message: message
-      }
+      },
+      isBot
     );
 
     if (response.success) {
