@@ -634,6 +634,7 @@
   // WEBSITE TEXT
   // ===================================================================
   const SECTION_NAMES = {
+    header: 'Header',
     hero: 'Top banner',
     about: 'About',
     approach: 'Why choose us & Our approach',

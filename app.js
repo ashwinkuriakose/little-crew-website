@@ -115,15 +115,33 @@ async function submitForm(record, emailData) {
 document.addEventListener('DOMContentLoaded', () => {
 
   // ==========================================
-  // 1. Header Scroll Effect
+  // 1. Header: solid once scrolled, hides while scrolling down
   // ==========================================
   const header = document.querySelector('.main-header');
-  window.addEventListener('scroll', () => {
-    if (window.scrollY > 20) {
-      header.classList.add('scrolled');
-    } else {
-      header.classList.remove('scrolled');
-    }
+  let lastY = window.scrollY;
+  function updateHeader() {
+    const y = window.scrollY;
+    header.classList.toggle('scrolled', y > 20);
+    const menuOpen = document.body.classList.contains('no-scroll');
+    header.classList.toggle('header-hidden', !menuOpen && y > 300 && y > lastY + 2);
+    if (y < lastY - 2 || y <= 300) header.classList.remove('header-hidden');
+    lastY = y;
+  }
+  window.addEventListener('scroll', updateHeader, { passive: true });
+  updateHeader();
+  header.addEventListener('focusin', () => header.classList.remove('header-hidden'));
+
+  // Underline the nav link for the section currently on screen
+  const navLinks = document.querySelectorAll('.desktop-nav .nav-item');
+  const spy = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (!entry.isIntersecting) return;
+      navLinks.forEach(link => link.classList.toggle('is-current', link.getAttribute('href') === '#' + entry.target.id));
+    });
+  }, { rootMargin: '-45% 0px -50% 0px' });
+  ['hero', 'about', 'services', 'events', 'contact'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) spy.observe(el);
   });
 
   // ==========================================
@@ -134,82 +152,57 @@ document.addEventListener('DOMContentLoaded', () => {
   const mobileNavItems = document.querySelectorAll('.mobile-nav-item');
 
   function toggleMobileMenu() {
-    hamburgerBtn.classList.toggle('active');
-    mobileNav.classList.toggle('active');
-    document.body.classList.toggle('no-scroll');
+    const open = !mobileNav.classList.contains('active');
+    header.classList.remove('header-hidden');
+    hamburgerBtn.classList.toggle('active', open);
+    mobileNav.classList.toggle('active', open);
+    document.body.classList.toggle('no-scroll', open);
+    hamburgerBtn.setAttribute('aria-expanded', String(open));
+    hamburgerBtn.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+    document.dispatchEvent(new CustomEvent(open ? 'lc:lock' : 'lc:unlock'));
   }
 
   hamburgerBtn.addEventListener('click', toggleMobileMenu);
-
   mobileNavItems.forEach(item => {
     item.addEventListener('click', () => {
-      // Close menu when links are clicked
-      if (mobileNav.classList.contains('active')) {
-        toggleMobileMenu();
-      }
+      if (mobileNav.classList.contains('active')) toggleMobileMenu();
     });
   });
-
-  // ==========================================
-  // 3. Scroll Reveal Animation (Intersection Observer)
-  // ==========================================
-  const animatedSections = document.querySelectorAll('section');
-
-  // Set up animation classes dynamically
-  animatedSections.forEach(section => {
-    section.classList.add('fade-in-section');
-  });
-
-  const scrollObserver = new IntersectionObserver((entries, observer) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        entry.target.classList.add('is-visible');
-
-        // Trigger stat counter animations when About section is visible
-        if (entry.target.id === 'about') {
-          animateCounters();
-        }
-
-        // Unobserve section after revealing
-        observer.unobserve(entry.target);
-      }
-    });
-  }, {
-    threshold: 0.15,
-    rootMargin: '0px 0px -50px 0px'
-  });
-
-  animatedSections.forEach(section => {
-    scrollObserver.observe(section);
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && mobileNav.classList.contains('active')) toggleMobileMenu();
   });
 
   // ==========================================
-  // 4. About Stats Counter Animation
+  // 3. About stats counters (start when the numbers come into view)
   // ==========================================
   let countersAnimated = false;
+  const statsBlock = document.querySelector('.about-stats');
+  if (statsBlock) {
+    new IntersectionObserver((entries, observer) => {
+      if (entries.some(e => e.isIntersecting)) {
+        animateCounters();
+        observer.disconnect();
+      }
+    }, { threshold: 0.4 }).observe(statsBlock);
+  }
 
   function animateCounters() {
     if (countersAnimated) return;
     countersAnimated = true;
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-    const counters = document.querySelectorAll('.stat-num');
-    counters.forEach(counter => {
-      const target = +counter.getAttribute('data-val');
-      const speed = 100; // Lower is slower
-
-      const updateCount = () => {
-        const count = +counter.innerText;
-        const inc = Math.ceil(target / speed);
-
-        if (count < target) {
-          counter.innerText = count + inc > target ? target : count + inc;
-          setTimeout(updateCount, 15);
-        } else {
-          counter.innerText = target;
-        }
+    document.querySelectorAll('.stat-num').forEach(counter => {
+      const target = +counter.getAttribute('data-val') || 0;
+      if (reduce) { counter.innerText = target; return; }
+      const start = performance.now();
+      const duration = 1400;
+      const tick = now => {
+        const t = Math.min(1, (now - start) / duration);
+        const eased = 1 - Math.pow(1 - t, 4);
+        counter.innerText = Math.round(target * eased);
+        if (t < 1) requestAnimationFrame(tick);
       };
-
-      updateCount();
+      requestAnimationFrame(tick);
     });
   }
 
@@ -392,6 +385,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const active = document.querySelector('.filter-btn.active');
     applyFilter(active ? active.getAttribute('data-filter') : 'all');
+    renderNextUp(upcoming[0]);
+    document.dispatchEvent(new CustomEvent('cms:events'));
+  }
+
+  // Hero "Next up" card shows the first upcoming event
+  function renderNextUp(ev) {
+    const card = document.getElementById('nextUp');
+    if (!card) return;
+    if (!ev) { card.hidden = true; return; }
+    card.hidden = false;
+    const img = document.getElementById('nextUpImg');
+    if (ev.image_url) { img.src = safeUrl(ev.image_url); img.hidden = false; } else { img.hidden = true; }
+    document.getElementById('nextUpTitle').textContent = ev.title;
+    const date = [ev.date_day, ev.date_month, ev.date_year].filter(Boolean).join(' ');
+    document.getElementById('nextUpDate').textContent = date || stripEmoji(ev.time_label);
   }
 
   // ==========================================
@@ -434,6 +442,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const content = {};
         (rows || []).forEach(row => { content[row.key] = row.value; });
         applyContent(content);
+        document.dispatchEvent(new CustomEvent('cms:content'));
       })
       .catch(err => console.error('Could not load site content:', err));
 
@@ -476,6 +485,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     eventModal.classList.add('active');
     document.body.classList.add('no-scroll');
+    document.dispatchEvent(new CustomEvent('lc:lock'));
+    modalCloseBtn.focus({ preventScroll: true });
 
     const form = document.getElementById('modalBookingForm');
     if (form) form.addEventListener('submit', e => handleEventForm(e, data));
@@ -618,6 +629,7 @@ document.addEventListener('DOMContentLoaded', () => {
   function closeModal() {
     eventModal.classList.remove('active');
     document.body.classList.remove('no-scroll');
+    document.dispatchEvent(new CustomEvent('lc:unlock'));
   }
 
   // One listener handles every "open details" element, including events added later
@@ -627,6 +639,9 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   modalCloseBtn.addEventListener('click', closeModal);
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && eventModal.classList.contains('active')) closeModal();
+  });
   eventModal.addEventListener('click', (e) => {
     if (e.target === eventModal) closeModal();
   });
@@ -680,6 +695,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       eventModal.classList.add('active');
       document.body.classList.add('no-scroll');
+      document.dispatchEvent(new CustomEvent('lc:lock'));
 
       // Reset Form
       contactForm.reset();
