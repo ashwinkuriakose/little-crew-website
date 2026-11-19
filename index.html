@@ -45,9 +45,9 @@
         <span class="brand-tagline" data-cms="header.tagline" data-cms-label="Tagline under the logo">Limitless possibilities</span>
       </a>
       <nav class="desktop-nav" aria-label="Main navigation">
+        <a href="#events" class="nav-item">Events</a>
         <a href="#about" class="nav-item">About</a>
         <a href="#services" class="nav-item">Services</a>
-        <a href="#events" class="nav-item">Events</a>
         <a href="#contact" class="nav-item">Contact</a>
         <a href="#events" class="btn btn-ticket btn-sm">Book tickets</a>
       </nav>
@@ -62,9 +62,9 @@
   <!-- Mobile Navigation Overlay -->
   <div class="mobile-nav-overlay" id="mobileNav" data-lenis-prevent>
     <nav class="mobile-nav" aria-label="Mobile navigation">
+      <a href="#events" class="mobile-nav-item">Events</a>
       <a href="#about" class="mobile-nav-item">About</a>
       <a href="#services" class="mobile-nav-item">Services</a>
-      <a href="#events" class="mobile-nav-item">Events</a>
       <a href="#contact" class="mobile-nav-item">Contact</a>
     </nav>
   </div>
@@ -123,6 +123,120 @@
         <div class="ticker-track" id="tickerTrack"></div>
       </div>
       <p class="sr-only" id="tickerSource" data-cms="hero.marquee" data-cms-label="Scrolling ticker (separate items with /)">Live concerts / Media production / Event hosting / Social media marketing / Brand strategy / Business growth</p>
+    </section>
+
+    <!-- ============ EVENTS ============ -->
+    <section class="events band-dark" id="events">
+      <div class="container">
+        <div class="events-head">
+          <div>
+            <p class="events-kicker" data-cms="events.badge" data-cms-label="Small badge">Live & Unforgettable</p>
+            <h2 class="section-title" data-cms="events.heading" data-cms-label="Heading" data-cms-rich="gradient-text">Upcoming <span class="gradient-text">Events</span></h2>
+            <p class="events-subtitle" data-cms="events.subtitle" data-cms-label="Subtitle">Join us for extraordinary performances, live concerts, and vibrant celebrations</p>
+          </div>
+          <div class="events-filter" role="group" aria-label="Filter events">
+            <button class="filter-btn active" data-filter="all">All</button>
+            <button class="filter-btn" data-filter="upcoming">Upcoming (<span id="upcomingCount">3</span>)</button>
+            <button class="filter-btn" data-filter="past">Past (<span id="pastCount">1</span>)</button>
+          </div>
+        </div>
+
+        <!-- Built-in events (replaced by the database version when connected) -->
+        <div class="events-grid upcoming-grid" id="upcomingGrid">
+          <div class="event-card" data-category="upcoming">
+            <div class="event-image-wrapper open-event-modal" data-event-id="anarkali_marikar" title="Click to view details">
+              <img src="assets/anarkali_marikar_live.jpg" alt="Anarkali Marikar Remix poster" class="event-image">
+              <div class="event-date-badge"><span class="day">03</span><span class="month">JAN</span><span class="year">2027</span></div>
+              <div class="event-status-pill upcoming-pill">🎉 New Year 2027</div>
+            </div>
+            <div class="event-info">
+              <div class="event-meta">
+                <span class="event-time">⏰ Gate Opens: 5:00 PM</span>
+                <span class="event-location">📍 Maidstone Leisure Centre, ME15 7RN</span>
+              </div>
+              <h3 class="event-title">Anarkali Marikar Remix</h3>
+              <div class="event-tagline-text">New Year Party • Maidstone Leisure Centre</div>
+              <p class="event-desc">Celebrate the New Year with a spectacular live music performance by Anarkali Marikar and band! Featuring a Live DJ, authentic food stalls, for a night to remember.</p>
+              <div class="event-artist-row"><span class="artist-badge">🎧 Live DJ</span><span class="artist-badge">🍛 Food Stall</span></div>
+              <div class="event-actions">
+                <a href="https://littlecrew.crowdpass.co.uk/" target="_blank" rel="noopener noreferrer" class="btn btn-primary btn-sm">Book Now 🎟️</a>
+                <a href="tel:+447388890443" class="btn btn-outline btn-sm">Call Contact 📞</a>
+              </div>
+            </div>
+          </div>
+
+          <div class="event-card" data-category="upcoming">
+            <div class="event-image-wrapper open-event-modal" data-event-id="sooraj_santhosh" title="Click to view details">
+              <img src="assets/sooraj_santhosh_tour.jpg" alt="Sooraj Santhosh Live poster" class="event-image">
+              <div class="event-date-badge"><span class="day">MAY</span><span class="month">TOUR</span><span class="year">2027</span></div>
+              <div class="event-status-pill tour-pill">⚡ UK & Ireland Tour</div>
+            </div>
+            <div class="event-info">
+              <div class="event-meta">
+                <span class="event-time">🗓️ May 2027</span>
+                <span class="event-location">📍 UK & Ireland Tour</span>
+              </div>
+              <h3 class="event-title">Sooraj Santhosh Live</h3>
+              <div class="event-tagline-text">One Voice, A Thousand Emotions • Stay Tuned</div>
+              <p class="event-desc">Little Crew presents Sooraj Santhosh Live on his landmark tour across the UK and Ireland, powered by Joanna Holidays. Stay tuned for city and venue schedules!</p>
+              <div class="event-artist-row"><span class="artist-badge">Little Crew Presents</span><span class="artist-badge">Powered by Joanna Holidays</span></div>
+              <div class="event-actions">
+                <a href="tel:+447388890443" class="btn btn-outline btn-sm">Call Contact 📞</a>
+              </div>
+            </div>
+          </div>
+
+          <div class="event-card" data-category="upcoming">
+            <div class="event-image-wrapper open-event-modal" data-event-id="anju_joseph" title="Click to view details">
+              <img src="assets/anju_joseph_tour.jpg" alt="Anju Joseph Live poster" class="event-image">
+              <div class="event-date-badge"><span class="day">MAY</span><span class="month">JUN</span><span class="year">2027</span></div>
+              <div class="event-status-pill tour-pill">⚡ UK & Europe Tour</div>
+            </div>
+            <div class="event-info">
+              <div class="event-meta">
+                <span class="event-time">🗓️ May – June 2027</span>
+                <span class="event-location">📍 UK & Europe Tour</span>
+              </div>
+              <h3 class="event-title">Anju Joseph Live</h3>
+              <div class="event-tagline-text">A Complete Entertainment Show • UK & Europe</div>
+              <p class="event-desc">Little Crew and V4 Entertainments present Anju Joseph Live on a dynamic UK & Europe tour, with Sreenath Sivasankaran and comedy & mimicry by Mahesh Kunjumon.</p>
+              <div class="event-artist-row"><span class="artist-badge">Little Crew & V4</span><span class="artist-badge">Feat. Sreenath Sivasankaran</span></div>
+              <div class="event-actions">
+                <a href="tel:+447388890443" class="btn btn-outline btn-sm">Call Contact 📞</a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="past-events-section" id="pastEventsBlock">
+          <div class="past-head">
+            <h3 class="past-events-heading" data-cms="events.past_heading" data-cms-label="Past events heading" data-cms-rich="gradient-text">Past <span class="gradient-text">Events</span></h3>
+            <p class="events-subtitle" data-cms="events.past_subtitle" data-cms-label="Past events subtitle">Moments and memories from our celebrated gatherings</p>
+          </div>
+          <div class="events-grid past-grid" id="pastGrid">
+            <div class="event-card past-event-card" data-category="past">
+              <div class="event-image-wrapper open-event-modal" data-event-id="tun_fun" title="Click to view details">
+                <img src="assets/tun_fun_nights.jpg" alt="Tun Fun Nights poster" class="event-image past-event-image">
+                <div class="event-date-badge past-date"><span class="day">25</span><span class="month">JUL</span><span class="year">2026</span></div>
+                <div class="event-status-pill past-pill">✓ Concluded</div>
+              </div>
+              <div class="event-info">
+                <div class="event-meta">
+                  <span class="event-time">⏰ 08:00 PM</span>
+                  <span class="event-location">📍 Aura Bar & Club, Tunbridge Wells</span>
+                </div>
+                <h3 class="event-title">Tun Fun Nights</h3>
+                <div class="event-tagline-text">The Ultimate Multilingual DJ Night • Concluded</div>
+                <p class="event-desc">The ultimate multilingual DJ night. Live, loud, and unlimited fun at Aura Bar & Club with DJ Julix.</p>
+                <div class="event-artist-row"><span class="artist-badge">DJ JULIX</span></div>
+                <div class="event-actions">
+                  <button class="btn btn-outline btn-sm btn-block open-event-modal" data-event-id="tun_fun">View Event Highlights 📸</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </section>
 
     <!-- ============ ABOUT ============ -->
@@ -300,120 +414,6 @@
       </div>
     </section>
 
-    <!-- ============ EVENTS ============ -->
-    <section class="events band-dark" id="events">
-      <div class="container">
-        <div class="events-head">
-          <div>
-            <p class="events-kicker" data-cms="events.badge" data-cms-label="Small badge">Live & Unforgettable</p>
-            <h2 class="section-title" data-cms="events.heading" data-cms-label="Heading" data-cms-rich="gradient-text">Upcoming <span class="gradient-text">Events</span></h2>
-            <p class="events-subtitle" data-cms="events.subtitle" data-cms-label="Subtitle">Join us for extraordinary performances, live concerts, and vibrant celebrations</p>
-          </div>
-          <div class="events-filter" role="group" aria-label="Filter events">
-            <button class="filter-btn active" data-filter="all">All</button>
-            <button class="filter-btn" data-filter="upcoming">Upcoming (<span id="upcomingCount">3</span>)</button>
-            <button class="filter-btn" data-filter="past">Past (<span id="pastCount">1</span>)</button>
-          </div>
-        </div>
-
-        <!-- Built-in events (replaced by the database version when connected) -->
-        <div class="events-grid upcoming-grid" id="upcomingGrid">
-          <div class="event-card" data-category="upcoming">
-            <div class="event-image-wrapper open-event-modal" data-event-id="anarkali_marikar" title="Click to view details">
-              <img src="assets/anarkali_marikar_live.jpg" alt="Anarkali Marikar Remix poster" class="event-image">
-              <div class="event-date-badge"><span class="day">03</span><span class="month">JAN</span><span class="year">2027</span></div>
-              <div class="event-status-pill upcoming-pill">🎉 New Year 2027</div>
-            </div>
-            <div class="event-info">
-              <div class="event-meta">
-                <span class="event-time">⏰ Gate Opens: 5:00 PM</span>
-                <span class="event-location">📍 Maidstone Leisure Centre, ME15 7RN</span>
-              </div>
-              <h3 class="event-title">Anarkali Marikar Remix</h3>
-              <div class="event-tagline-text">New Year Party • Maidstone Leisure Centre</div>
-              <p class="event-desc">Celebrate the New Year with a spectacular live music performance by Anarkali Marikar and band! Featuring a Live DJ, authentic food stalls, for a night to remember.</p>
-              <div class="event-artist-row"><span class="artist-badge">🎧 Live DJ</span><span class="artist-badge">🍛 Food Stall</span></div>
-              <div class="event-actions">
-                <a href="https://littlecrew.crowdpass.co.uk/" target="_blank" rel="noopener noreferrer" class="btn btn-primary btn-sm">Book Now 🎟️</a>
-                <a href="tel:+447388890443" class="btn btn-outline btn-sm">Call Contact 📞</a>
-              </div>
-            </div>
-          </div>
-
-          <div class="event-card" data-category="upcoming">
-            <div class="event-image-wrapper open-event-modal" data-event-id="sooraj_santhosh" title="Click to view details">
-              <img src="assets/sooraj_santhosh_tour.jpg" alt="Sooraj Santhosh Live poster" class="event-image">
-              <div class="event-date-badge"><span class="day">MAY</span><span class="month">TOUR</span><span class="year">2027</span></div>
-              <div class="event-status-pill tour-pill">⚡ UK & Ireland Tour</div>
-            </div>
-            <div class="event-info">
-              <div class="event-meta">
-                <span class="event-time">🗓️ May 2027</span>
-                <span class="event-location">📍 UK & Ireland Tour</span>
-              </div>
-              <h3 class="event-title">Sooraj Santhosh Live</h3>
-              <div class="event-tagline-text">One Voice, A Thousand Emotions • Stay Tuned</div>
-              <p class="event-desc">Little Crew presents Sooraj Santhosh Live on his landmark tour across the UK and Ireland, powered by Joanna Holidays. Stay tuned for city and venue schedules!</p>
-              <div class="event-artist-row"><span class="artist-badge">Little Crew Presents</span><span class="artist-badge">Powered by Joanna Holidays</span></div>
-              <div class="event-actions">
-                <a href="tel:+447388890443" class="btn btn-outline btn-sm">Call Contact 📞</a>
-              </div>
-            </div>
-          </div>
-
-          <div class="event-card" data-category="upcoming">
-            <div class="event-image-wrapper open-event-modal" data-event-id="anju_joseph" title="Click to view details">
-              <img src="assets/anju_joseph_tour.jpg" alt="Anju Joseph Live poster" class="event-image">
-              <div class="event-date-badge"><span class="day">MAY</span><span class="month">JUN</span><span class="year">2027</span></div>
-              <div class="event-status-pill tour-pill">⚡ UK & Europe Tour</div>
-            </div>
-            <div class="event-info">
-              <div class="event-meta">
-                <span class="event-time">🗓️ May – June 2027</span>
-                <span class="event-location">📍 UK & Europe Tour</span>
-              </div>
-              <h3 class="event-title">Anju Joseph Live</h3>
-              <div class="event-tagline-text">A Complete Entertainment Show • UK & Europe</div>
-              <p class="event-desc">Little Crew and V4 Entertainments present Anju Joseph Live on a dynamic UK & Europe tour, with Sreenath Sivasankaran and comedy & mimicry by Mahesh Kunjumon.</p>
-              <div class="event-artist-row"><span class="artist-badge">Little Crew & V4</span><span class="artist-badge">Feat. Sreenath Sivasankaran</span></div>
-              <div class="event-actions">
-                <a href="tel:+447388890443" class="btn btn-outline btn-sm">Call Contact 📞</a>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="past-events-section" id="pastEventsBlock">
-          <div class="past-head">
-            <h3 class="past-events-heading" data-cms="events.past_heading" data-cms-label="Past events heading" data-cms-rich="gradient-text">Past <span class="gradient-text">Events</span></h3>
-            <p class="events-subtitle" data-cms="events.past_subtitle" data-cms-label="Past events subtitle">Moments and memories from our celebrated gatherings</p>
-          </div>
-          <div class="events-grid past-grid" id="pastGrid">
-            <div class="event-card past-event-card" data-category="past">
-              <div class="event-image-wrapper open-event-modal" data-event-id="tun_fun" title="Click to view details">
-                <img src="assets/tun_fun_nights.jpg" alt="Tun Fun Nights poster" class="event-image past-event-image">
-                <div class="event-date-badge past-date"><span class="day">25</span><span class="month">JUL</span><span class="year">2026</span></div>
-                <div class="event-status-pill past-pill">✓ Concluded</div>
-              </div>
-              <div class="event-info">
-                <div class="event-meta">
-                  <span class="event-time">⏰ 08:00 PM</span>
-                  <span class="event-location">📍 Aura Bar & Club, Tunbridge Wells</span>
-                </div>
-                <h3 class="event-title">Tun Fun Nights</h3>
-                <div class="event-tagline-text">The Ultimate Multilingual DJ Night • Concluded</div>
-                <p class="event-desc">The ultimate multilingual DJ night. Live, loud, and unlimited fun at Aura Bar & Club with DJ Julix.</p>
-                <div class="event-artist-row"><span class="artist-badge">DJ JULIX</span></div>
-                <div class="event-actions">
-                  <button class="btn btn-outline btn-sm btn-block open-event-modal" data-event-id="tun_fun">View Event Highlights 📸</button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
     <!-- ============ CONTACT ============ -->
     <section class="contact band-hot" id="contact">
       <div class="container contact-grid">
@@ -494,9 +494,9 @@
           <p class="footer-tagline" data-cms="footer.tagline" data-cms-label="Tagline under logo">Limitless Possibilities..</p>
         </div>
         <nav class="footer-nav" aria-label="Footer navigation">
+          <a href="#events">Events</a>
           <a href="#about">About</a>
           <a href="#services">Services</a>
-          <a href="#events">Events</a>
           <a href="#contact">Contact</a>
         </nav>
       </div>
