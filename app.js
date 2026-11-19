@@ -412,8 +412,159 @@ document.addEventListener('DOMContentLoaded', () => {
     const active = document.querySelector('.filter-btn.active');
     applyFilter(active ? active.getAttribute('data-filter') : 'all');
     renderNextUp(upcoming[0]);
+    renderHeroSlides(events.filter(ev => ev.featured && ev.category !== 'past'));
     document.dispatchEvent(new CustomEvent('cms:events'));
   }
+
+  // ==========================================
+  // Hero slider: event ads chosen in the admin ("Show in top banner"),
+  // followed by the brand slide
+  // ==========================================
+  const heroEl = document.getElementById('hero');
+  const slidesEl = document.getElementById('heroSlides');
+  const heroControls = document.getElementById('heroControls');
+  const dotsEl = document.getElementById('heroDots');
+  const pauseBtn = document.getElementById('heroPause');
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const SLIDE_MS = 7000;
+  let slideIndex = 0;
+  let userPaused = false;
+  let hoverPaused = false;
+
+  heroEl.style.setProperty('--slide-ms', `${SLIDE_MS}ms`);
+  if (reduceMotion) heroEl.classList.add('no-autoplay');
+
+  const allSlides = () => Array.from(slidesEl.querySelectorAll('.hero-slide'));
+
+  function eventSlideHtml(ev) {
+    const id = escapeHtml(ev.id);
+    const mode = bookingMode(ev);
+    const img = safeUrl(ev.image_url);
+    // Only use the date badge when it's a real day (tours put words like "MAY / TOUR" there)
+    const date = /^\d{1,2}$/.test(String(ev.date_day || '').trim())
+      ? [ev.date_day, ev.date_month, ev.date_year].filter(Boolean).join(' ')
+      : '';
+    const meta = [date, stripEmoji(ev.time_label), stripEmoji(ev.location)].filter(Boolean);
+
+    let actions;
+    if (mode === 'tickets') {
+      actions = `<a href="${escapeHtml(safeUrl(ev.booking_url))}" target="_blank" rel="noopener noreferrer" class="btn btn-ticket">Book tickets 🎟️</a>
+        <button class="btn btn-ghost open-event-modal" data-event-id="${id}">Event details</button>`;
+    } else if (mode === 'waitlist') {
+      actions = `<button class="btn btn-ticket open-event-modal" data-event-id="${id}">Join the waitlist 📝</button>`;
+    } else {
+      actions = `<button class="btn btn-ticket open-event-modal" data-event-id="${id}">Enquire now</button>`;
+    }
+
+    return `
+      <div class="hero-slide hero-slide-event" role="group" aria-roledescription="slide" aria-label="${escapeHtml(ev.title)}">
+        ${img ? `<div class="slide-backdrop" style="background-image:url('${escapeHtml(img.replace(/'/g, '%27'))}')"></div>` : ''}
+        <div class="container slide-event-inner">
+          <div class="slide-copy">
+            ${ev.status_pill ? `<p class="slide-kicker">${escapeHtml(ev.status_pill)}</p>` : ''}
+            <h2 class="slide-title">${escapeHtml(ev.title)}</h2>
+            ${ev.tagline ? `<p class="slide-tagline">${escapeHtml(ev.tagline)}</p>` : ''}
+            ${meta.length ? `<ul class="slide-meta">${meta.map(m => `<li>${escapeHtml(m)}</li>`).join('')}</ul>` : ''}
+            ${ev.summary ? `<p class="slide-summary">${escapeHtml(ev.summary)}</p>` : ''}
+            <div class="slide-actions">${actions}</div>
+          </div>
+          ${img ? `<div class="slide-poster open-event-modal" data-event-id="${id}" title="View event details"><img src="${escapeHtml(img)}" alt="${escapeHtml(ev.title)} poster"></div>` : ''}
+        </div>
+      </div>`;
+  }
+
+  function renderHeroSlides(featured) {
+    slidesEl.querySelectorAll('.hero-slide-event').forEach(el => el.remove());
+    const brand = slidesEl.querySelector('.hero-slide-brand');
+    featured.forEach(ev => brand.insertAdjacentHTML('beforebegin', eventSlideHtml(ev)));
+    setupSlider();
+  }
+
+  function setupSlider() {
+    const slides = allSlides();
+    heroControls.hidden = slides.length < 2;
+    pauseBtn.hidden = reduceMotion;
+    dotsEl.innerHTML = slides.map((slide, i) =>
+      `<button class="slider-dot" role="tab" aria-label="Slide ${i + 1} of ${slides.length}: ${escapeHtml(slide.getAttribute('aria-label') || '')}"></button>`
+    ).join('');
+    goToSlide(0);
+  }
+
+  function isPaused() {
+    return reduceMotion || userPaused || hoverPaused || document.hidden;
+  }
+
+  function updatePauseState() {
+    heroEl.classList.toggle('is-paused', isPaused());
+  }
+
+  function goToSlide(index) {
+    const slides = allSlides();
+    if (!slides.length) return;
+    slideIndex = (index + slides.length) % slides.length;
+    slides.forEach((slide, i) => {
+      const active = i === slideIndex;
+      slide.classList.toggle('is-active', active);
+      slide.setAttribute('aria-hidden', String(!active));
+      slide.inert = !active; // hidden slides can't be tabbed into
+    });
+    Array.from(dotsEl.children).forEach((dot, i) => {
+      dot.classList.remove('is-active');
+      dot.setAttribute('aria-selected', String(i === slideIndex));
+    });
+    const dot = dotsEl.children[slideIndex];
+    if (dot) {
+      void dot.offsetWidth; // restart the progress animation
+      dot.classList.add('is-active');
+    }
+    updatePauseState();
+  }
+
+  // The active dot's progress bar drives autoplay: when it fills, move on
+  dotsEl.addEventListener('animationend', e => {
+    if (e.target.classList.contains('is-active') && !isPaused() && allSlides().length > 1) goToSlide(slideIndex + 1);
+  });
+  dotsEl.addEventListener('click', e => {
+    const dot = e.target.closest('.slider-dot');
+    if (dot) goToSlide(Array.from(dotsEl.children).indexOf(dot));
+  });
+  document.getElementById('heroPrev').addEventListener('click', () => goToSlide(slideIndex - 1));
+  document.getElementById('heroNext').addEventListener('click', () => goToSlide(slideIndex + 1));
+  pauseBtn.addEventListener('click', () => {
+    userPaused = !userPaused;
+    pauseBtn.textContent = userPaused ? '▶' : '❚❚';
+    pauseBtn.setAttribute('aria-label', userPaused ? 'Play slideshow' : 'Pause slideshow');
+    updatePauseState();
+  });
+
+  // Pause while someone is pointing at or tabbing through the banner
+  slidesEl.addEventListener('mouseenter', () => { hoverPaused = true; updatePauseState(); });
+  slidesEl.addEventListener('mouseleave', () => { hoverPaused = false; updatePauseState(); });
+  heroEl.addEventListener('focusin', () => { hoverPaused = true; updatePauseState(); });
+  heroEl.addEventListener('focusout', () => { hoverPaused = false; updatePauseState(); });
+  document.addEventListener('visibilitychange', updatePauseState);
+
+  heroControls.addEventListener('keydown', e => {
+    if (e.key === 'ArrowLeft') goToSlide(slideIndex - 1);
+    if (e.key === 'ArrowRight') goToSlide(slideIndex + 1);
+  });
+
+  // Swipe on touch screens
+  let touchStart = null;
+  slidesEl.addEventListener('pointerdown', e => {
+    if (e.pointerType !== 'mouse') touchStart = { x: e.clientX, y: e.clientY };
+  });
+  slidesEl.addEventListener('pointerup', e => {
+    if (!touchStart) return;
+    const dx = e.clientX - touchStart.x;
+    const dy = e.clientY - touchStart.y;
+    touchStart = null;
+    if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy) * 1.2) goToSlide(slideIndex + (dx < 0 ? 1 : -1));
+  });
+  slidesEl.addEventListener('pointercancel', () => { touchStart = null; });
+  slidesEl.style.touchAction = 'pan-y';
+
+  setupSlider();
 
   // Hero "Next up" card shows the first upcoming event
   function renderNextUp(ev) {

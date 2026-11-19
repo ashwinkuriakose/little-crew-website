@@ -23,7 +23,7 @@
     href="https://fonts.googleapis.com/css2?family=Anybody:ital,wdth,wght@0,50..150,300..900;1,50..150,300..900&family=Instrument+Sans:wght@400..700&display=swap"
     rel="stylesheet">
 
-  <link rel="stylesheet" href="style.css?v=3.0">
+  <link rel="stylesheet" href="style.css?v=3.1">
   <script>
     // Hide the hero headline until effects.js splits it into lines (3s failsafe)
     if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
@@ -73,6 +73,10 @@
 
     <!-- ============ HERO ============ -->
     <section class="hero band-dark" id="hero">
+      <!-- Slider: event ad slides (chosen in Admin → Events → "Show in top banner")
+           are added in front of the brand slide by app.js -->
+      <div class="hero-slides" id="heroSlides" aria-roledescription="carousel" aria-label="Highlights">
+      <div class="hero-slide hero-slide-brand is-active" data-slide="brand" role="group" aria-roledescription="slide" aria-label="Little Crew & Co">
       <div class="container hero-inner">
         <p class="hero-sticker" data-cms="hero.badge" data-cms-label="Sticker above the title">Media & events from Kent</p>
 
@@ -103,6 +107,16 @@
             </span>
           </a>
         </div>
+      </div>
+      </div>
+      </div>
+
+      <!-- Slider controls (shown only when there is more than one slide) -->
+      <div class="container hero-controls" id="heroControls" hidden>
+        <button class="slider-arrow" id="heroPrev" aria-label="Previous slide">&#8592;</button>
+        <div class="slider-dots" id="heroDots" role="tablist" aria-label="Choose slide"></div>
+        <button class="slider-arrow" id="heroNext" aria-label="Next slide">&#8594;</button>
+        <button class="slider-pause" id="heroPause" aria-label="Pause slideshow">❚❚</button>
       </div>
 
       <div class="ticker" aria-hidden="true">
@@ -504,7 +518,7 @@
 
   <script src="https://cdn.jsdelivr.net/npm/lenis@1.1.13/dist/lenis.min.js" defer></script>
   <script src="cms-config.js?v=1"></script>
-  <script src="app.js?v=3.2"></script>
+  <script src="app.js?v=3.3"></script>
   <script src="effects.js?v=1.1" defer></script>
 </body>
 

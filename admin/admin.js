@@ -424,14 +424,16 @@
     $('#eventImageFile').addEventListener('change', uploadEventImage);
     $('#eventList').addEventListener('click', onEventListClick);
     $('#eventList').addEventListener('change', async e => {
-      const toggle = e.target.closest('input[data-publish]');
+      const toggle = e.target.closest('input[data-publish], input[data-feature]');
       if (!toggle) return;
-      const ev = events.find(x => x.id === toggle.dataset.publish);
-      const { error } = await sb.from('events').update({ published: toggle.checked, updated_at: new Date().toISOString() }).eq('id', ev.id);
+      const field = toggle.dataset.publish ? 'published' : 'featured';
+      const ev = events.find(x => x.id === (toggle.dataset.publish || toggle.dataset.feature));
+      const { error } = await sb.from('events').update({ [field]: toggle.checked, updated_at: new Date().toISOString() }).eq('id', ev.id);
       if (error) { toggle.checked = !toggle.checked; fail(error, 'Could not update'); return; }
-      ev.published = toggle.checked;
+      ev[field] = toggle.checked;
       renderEvents();
-      toast(toggle.checked ? 'Now visible on the website' : 'Hidden from the website');
+      if (field === 'published') toast(toggle.checked ? 'Now visible on the website' : 'Hidden from the website');
+      else toast(toggle.checked ? 'Added to the top banner' : 'Removed from the top banner');
     });
   }
 
@@ -464,6 +466,10 @@
           <label class="switch" title="Show on website">
             <input type="checkbox" data-publish="${esc(ev.id)}" ${ev.published ? 'checked' : ''}>
             <span class="track"></span> ${ev.published ? 'Visible' : 'Hidden'}
+          </label>
+          <label class="switch" title="Show as an ad in the top banner slider">
+            <input type="checkbox" data-feature="${esc(ev.id)}" ${ev.featured ? 'checked' : ''}>
+            <span class="track"></span> Banner
           </label>
           <button class="btn btn-ghost btn-sm" data-edit="${esc(ev.id)}">Edit</button>
           <button class="btn btn-ghost btn-sm" data-duplicate="${esc(ev.id)}">Duplicate</button>
@@ -517,6 +523,7 @@
       delete copy.id; delete copy.created_at; delete copy.updated_at;
       copy.title = `${src.title} (copy)`;
       copy.published = false;
+      copy.featured = false;
       copy.sort_order = Math.max(0, ...events.map(x => x.sort_order)) + 1;
       const { data, error } = await sb.from('events').insert(copy).select().single();
       if (error) { fail(error, 'Could not duplicate'); return; }
@@ -571,6 +578,7 @@
     form.booking_mode.value = id ? modeOf(ev) : 'enquiry';
     syncBookingFields();
     form.published.checked = !!ev.published;
+    form.featured.checked = !!ev.featured;
     form.badges.value = (ev.badges || []).join('\n');
     updateImagePreview(ev.image_url);
     openDrawer('eventDrawer');
@@ -607,6 +615,7 @@
     record.category = form.category.value;
     record.pill_style = form.pill_style.value;
     record.published = form.published.checked;
+    record.featured = form.featured.checked;
     record.badges = form.badges.value.split('\n').map(s => s.trim()).filter(Boolean);
     record.updated_at = new Date().toISOString();
 

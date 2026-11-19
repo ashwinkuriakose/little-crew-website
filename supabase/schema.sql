@@ -51,6 +51,7 @@ create table if not exists public.events (
   id uuid primary key default gen_random_uuid(),
   category text not null default 'upcoming' check (category in ('upcoming', 'past')),
   published boolean not null default true,
+  featured boolean not null default false,   -- show as a slide in the top banner
   sort_order int not null default 0,
 
   -- card
@@ -110,6 +111,7 @@ create table if not exists public.submissions (
 );
 
 -- Upgrades for databases created with an earlier version of this file
+alter table public.events add column if not exists featured boolean not null default false;
 alter table public.events add column if not exists booking_mode text not null default 'enquiry'
   check (booking_mode in ('tickets', 'waitlist', 'enquiry'));
 update public.events set booking_mode = 'tickets' where booking_url is not null and booking_mode = 'enquiry';
