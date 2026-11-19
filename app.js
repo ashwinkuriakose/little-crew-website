@@ -402,12 +402,15 @@ document.addEventListener('DOMContentLoaded', () => {
         description: ev.description || ev.summary || '',
         mode: bookingMode(ev),
         ctaText: ev.cta_text || { tickets: 'Book Tickets Now 🎟️', waitlist: 'Join Waitlist 📝', enquiry: 'Send Enquiry' }[bookingMode(ev)],
-        bookingUrl: safeUrl(ev.booking_url)
+        bookingUrl: safeUrl(ev.booking_url),
+        waitlistOptions: (ev.waitlist_options || []).map(o => String(o).trim()).filter(Boolean)
       };
     });
 
-    document.getElementById('upcomingCount').textContent = upcoming.length;
-    document.getElementById('pastCount').textContent = past.length;
+    const upcomingCount = document.getElementById('upcomingCount');
+    const pastCount = document.getElementById('pastCount');
+    if (upcomingCount) upcomingCount.textContent = upcoming.length;
+    if (pastCount) pastCount.textContent = past.length;
 
     const active = document.querySelector('.filter-btn.active');
     applyFilter(active ? active.getAttribute('data-filter') : 'all');
@@ -607,8 +610,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Show or hide the Past Events sub-section block
     if (pastEventsBlock) {
+      // Past events live in their own section further down; hide it when there are none
       const hide = filterValue === 'upcoming' || pastEventsBlock.dataset.empty === 'true';
-      pastEventsBlock.style.display = hide ? 'none' : 'block';
+      (document.getElementById('past-events') || pastEventsBlock).style.display = hide ? 'none' : '';
     }
   }
 
@@ -716,6 +720,14 @@ document.addEventListener('DOMContentLoaded', () => {
               <span>UK postcode</span>
               <input type="text" id="booking_postcode" required maxlength="10" autocomplete="postal-code" placeholder="TN1 1XF" style="text-transform: uppercase;">
             </label>
+            ${(data.waitlistOptions || []).length ? `
+            <label class="waitlist-field waitlist-field-full">
+              <span>Preferred location</span>
+              <select id="booking_location" required>
+                <option value="" selected disabled>Choose a location</option>
+                ${data.waitlistOptions.map(o => `<option value="${escapeHtml(o)}">${escapeHtml(o)}</option>`).join('')}
+              </select>
+            </label>` : ''}
           </div>
           <p class="waitlist-error" id="waitlistError" role="alert"></p>
           ${honeypot}
@@ -747,6 +759,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const isBot = document.getElementById('booking_website').value !== '';
     let phone = null;
     let postcode = null;
+    let location = null;
 
     if (isWaitlist) {
       const errorBox = document.getElementById('waitlistError');
@@ -760,8 +773,13 @@ document.addEventListener('DOMContentLoaded', () => {
       if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) problems.push([document.getElementById('booking_email'), 'Please enter a valid email address.']);
       if (!phone) problems.push([phoneInput, 'Please enter a valid UK phone number, e.g. 07123 456789.']);
       if (!postcode) problems.push([postcodeInput, 'Please enter a valid UK postcode, e.g. TN1 1XF.']);
+      const locationSelect = document.getElementById('booking_location');
+      if (locationSelect) {
+        location = locationSelect.value;
+        if (!location) problems.push([locationSelect, 'Please choose your preferred location.']);
+      }
 
-      form.querySelectorAll('input').forEach(input => input.removeAttribute('aria-invalid'));
+      form.querySelectorAll('input, select').forEach(input => input.removeAttribute('aria-invalid'));
       if (problems.length) {
         problems.forEach(([input]) => input.setAttribute('aria-invalid', 'true'));
         errorBox.textContent = problems[0][1];
@@ -779,13 +797,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const details = `Time: ${data.time || '-'}\nLocation: ${data.location || '-'}`;
     const response = await submitForm(
       isWaitlist
-        ? { form: 'waitlist', name, email, phone, postcode, subject: `Waitlist: ${data.title}`.slice(0, 300), event_title: data.title.slice(0, 300), message: details }
+        ? { form: 'waitlist', name, email, phone, postcode, ...(location ? { preferred_location: location } : {}), subject: `Waitlist: ${data.title}${location ? ` (${location})` : ''}`.slice(0, 300), event_title: data.title.slice(0, 300), message: details }
         : { form: 'booking', name, email, subject: `Event enquiry: ${data.title}`.slice(0, 300), event_title: data.title.slice(0, 300), message: details },
       isWaitlist
         ? {
           name, email, phone,
-          subject: `[Waitlist] ${data.title}`,
-          message: `Waitlist sign-up:\n- Event: ${data.title}\n- Name: ${name}\n- Email: ${email}\n- Phone: ${phone}\n- Postcode: ${postcode}`
+          subject: `[Waitlist] ${data.title}${location ? ` – ${location}` : ''}`,
+          message: `Waitlist sign-up:\n- Event: ${data.title}\n- Name: ${name}\n- Email: ${email}\n- Phone: ${phone}\n- Postcode: ${postcode}${location ? `\n- Preferred location: ${location}` : ''}`
         }
         : {
           name, email,

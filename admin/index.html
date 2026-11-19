@@ -131,6 +131,7 @@
                 <th data-sort="email">Email</th>
                 <th>Phone</th>
                 <th data-sort="postcode">Postcode</th>
+                <th data-sort="preferred_location">Location</th>
                 <th data-sort="subject">Subject / Event</th>
                 <th>Message</th>
                 <th data-sort="status">Status</th>
@@ -273,6 +274,10 @@
             <label class="field" id="bookingUrlField"><span id="bookingUrlLabel">Ticket link for this event</span><input name="booking_url" type="url" placeholder="https://…"></label>
             <label class="field"><span>Contact phone (adds "Call")</span><input name="phone" placeholder="+447388890443"></label>
           </div>
+          <label class="field" id="waitlistOptionsField"><span>Waitlist location choices (optional, one per line)</span>
+            <textarea name="waitlist_options" rows="3" placeholder="London&#10;Leicester&#10;Bristol"></textarea>
+          </label>
+          <p class="hint" id="waitlistOptionsHint">If you add places here, the waitlist form gets a required “Preferred location” dropdown. Leave empty for no dropdown.</p>
         </div>
 
         <div class="form-section">
@@ -301,7 +306,7 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
   <script src="../cms-config.js?v=1"></script>
-  <script src="admin.js?v=5"></script>
+  <script src="admin.js?v=6"></script>
 </body>
 
 </html>

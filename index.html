@@ -23,7 +23,7 @@
     href="https://fonts.googleapis.com/css2?family=Anybody:ital,wdth,wght@0,50..150,300..900;1,50..150,300..900&family=Instrument+Sans:wght@400..700&display=swap"
     rel="stylesheet">
 
-  <link rel="stylesheet" href="style.css?v=3.3">
+  <link rel="stylesheet" href="style.css?v=3.4">
   <script>
     // Hide the hero headline until effects.js splits it into lines (3s failsafe)
     if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
@@ -134,11 +134,6 @@
             <h2 class="section-title" data-cms="events.heading" data-cms-label="Heading" data-cms-rich="gradient-text">Upcoming <span class="gradient-text">Events</span></h2>
             <p class="events-subtitle" data-cms="events.subtitle" data-cms-label="Subtitle">Join us for extraordinary performances, live concerts, and vibrant celebrations</p>
           </div>
-          <div class="events-filter" role="group" aria-label="Filter events">
-            <button class="filter-btn active" data-filter="all">All</button>
-            <button class="filter-btn" data-filter="upcoming">Upcoming (<span id="upcomingCount">3</span>)</button>
-            <button class="filter-btn" data-filter="past">Past (<span id="pastCount">1</span>)</button>
-          </div>
         </div>
 
         <!-- Built-in events (replaced by the database version when connected) -->
@@ -208,34 +203,6 @@
           </div>
         </div>
 
-        <div class="past-events-section" id="pastEventsBlock">
-          <div class="past-head">
-            <h3 class="past-events-heading" data-cms="events.past_heading" data-cms-label="Past events heading" data-cms-rich="gradient-text">Past <span class="gradient-text">Events</span></h3>
-            <p class="events-subtitle" data-cms="events.past_subtitle" data-cms-label="Past events subtitle">Moments and memories from our celebrated gatherings</p>
-          </div>
-          <div class="events-grid past-grid" id="pastGrid">
-            <div class="event-card past-event-card" data-category="past">
-              <div class="event-image-wrapper open-event-modal" data-event-id="tun_fun" title="Click to view details">
-                <img src="assets/tun_fun_nights.jpg" alt="Tun Fun Nights poster" class="event-image past-event-image">
-                <div class="event-date-badge past-date"><span class="day">25</span><span class="month">JUL</span><span class="year">2026</span></div>
-                <div class="event-status-pill past-pill">✓ Concluded</div>
-              </div>
-              <div class="event-info">
-                <div class="event-meta">
-                  <span class="event-time">⏰ 08:00 PM</span>
-                  <span class="event-location">📍 Aura Bar & Club, Tunbridge Wells</span>
-                </div>
-                <h3 class="event-title">Tun Fun Nights</h3>
-                <div class="event-tagline-text">The Ultimate Multilingual DJ Night • Concluded</div>
-                <p class="event-desc">The ultimate multilingual DJ night. Live, loud, and unlimited fun at Aura Bar & Club with DJ Julix.</p>
-                <div class="event-artist-row"><span class="artist-badge">DJ JULIX</span></div>
-                <div class="event-actions">
-                  <button class="btn btn-outline btn-sm btn-block open-event-modal" data-event-id="tun_fun">View Event Highlights 📸</button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
       </div>
     </section>
 
@@ -414,6 +381,40 @@
       </div>
     </section>
 
+    <!-- ============ PAST EVENTS ============ -->
+    <section class="past-events band-dark" id="past-events">
+      <div class="container">
+        <div class="past-events-section" id="pastEventsBlock">
+          <div class="past-head">
+            <h3 class="past-events-heading" data-cms="events.past_heading" data-cms-label="Past events heading" data-cms-rich="gradient-text">Past <span class="gradient-text">Events</span></h3>
+            <p class="events-subtitle" data-cms="events.past_subtitle" data-cms-label="Past events subtitle">Moments and memories from our celebrated gatherings</p>
+          </div>
+          <div class="events-grid past-grid" id="pastGrid">
+            <div class="event-card past-event-card" data-category="past">
+              <div class="event-image-wrapper open-event-modal" data-event-id="tun_fun" title="Click to view details">
+                <img src="assets/tun_fun_nights.jpg" alt="Tun Fun Nights poster" class="event-image past-event-image">
+                <div class="event-date-badge past-date"><span class="day">25</span><span class="month">JUL</span><span class="year">2026</span></div>
+                <div class="event-status-pill past-pill">✓ Concluded</div>
+              </div>
+              <div class="event-info">
+                <div class="event-meta">
+                  <span class="event-time">⏰ 08:00 PM</span>
+                  <span class="event-location">📍 Aura Bar & Club, Tunbridge Wells</span>
+                </div>
+                <h3 class="event-title">Tun Fun Nights</h3>
+                <div class="event-tagline-text">The Ultimate Multilingual DJ Night • Concluded</div>
+                <p class="event-desc">The ultimate multilingual DJ night. Live, loud, and unlimited fun at Aura Bar & Club with DJ Julix.</p>
+                <div class="event-artist-row"><span class="artist-badge">DJ JULIX</span></div>
+                <div class="event-actions">
+                  <button class="btn btn-outline btn-sm btn-block open-event-modal" data-event-id="tun_fun">View Event Highlights 📸</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <!-- ============ CONTACT ============ -->
     <section class="contact band-hot" id="contact">
       <div class="container contact-grid">
@@ -518,7 +519,7 @@
 
   <script src="https://cdn.jsdelivr.net/npm/lenis@1.1.13/dist/lenis.min.js" defer></script>
   <script src="cms-config.js?v=1"></script>
-  <script src="app.js?v=3.5"></script>
+  <script src="app.js?v=3.6"></script>
   <script src="effects.js?v=1.1" defer></script>
 </body>
 

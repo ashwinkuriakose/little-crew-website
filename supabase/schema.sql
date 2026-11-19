@@ -72,6 +72,7 @@ create table if not exists public.events (
   -- 'enquiry' = simple name + email enquiry form
   booking_mode text not null default 'enquiry' check (booking_mode in ('tickets', 'waitlist', 'enquiry')),
   booking_url text,
+  waitlist_options text[] not null default '{}',   -- e.g. {London,Leicester,Bristol}: adds a location dropdown to the waitlist form
   phone text,
 
   -- details popup (falls back to card fields when empty)
@@ -108,12 +109,15 @@ create table if not exists public.submissions (
   message text check (char_length(message) <= 5000),
   event_title text check (char_length(event_title) <= 300),
   postcode text check (char_length(postcode) <= 10),
+  preferred_location text check (char_length(preferred_location) <= 100),
   status text not null default 'new' check (status in ('new', 'read', 'archived'))
 );
 
 -- Upgrades for databases created with an earlier version of this file
 alter table public.events add column if not exists featured boolean not null default false;
 alter table public.events add column if not exists banner_image_url text;
+alter table public.events add column if not exists waitlist_options text[] not null default '{}';
+alter table public.submissions add column if not exists preferred_location text check (char_length(preferred_location) <= 100);
 alter table public.events add column if not exists booking_mode text not null default 'enquiry'
   check (booking_mode in ('tickets', 'waitlist', 'enquiry'));
 update public.events set booking_mode = 'tickets' where booking_url is not null and booking_mode = 'enquiry';

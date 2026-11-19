@@ -233,7 +233,7 @@
       if (from && created < from) return false;
       if (to && created > to) return false;
       if (q) {
-        const hay = [s.name, s.email, s.phone, s.postcode, s.subject, s.message, s.event_title].join(' ').toLowerCase();
+        const hay = [s.name, s.email, s.phone, s.postcode, s.preferred_location, s.subject, s.message, s.event_title].join(' ').toLowerCase();
         if (!hay.includes(q)) return false;
       }
       return true;
@@ -271,6 +271,7 @@
         <td data-label="Email">${esc(s.email)}</td>
         <td class="cell-nowrap" data-label="Phone">${esc(s.phone || '')}</td>
         <td class="cell-nowrap" data-label="Postcode">${esc(s.postcode || '')}</td>
+        <td class="cell-nowrap" data-label="Location">${esc(s.preferred_location || '')}</td>
         <td data-label="${s.form === 'contact' ? 'Subject' : 'Event'}">${esc(subjectOf(s))}</td>
         <td data-label="Message"><div class="cell-msg">${esc(s.message || '')}</div></td>
         <td data-label="Status"><span class="tag tag-${esc(s.status)}">${esc(s.status)}</span></td>
@@ -351,6 +352,7 @@
         <dt>Email</dt><dd><a href="mailto:${esc(s.email)}">${esc(s.email)}</a></dd>
         <dt>Phone</dt><dd>${s.phone ? `<a href="tel:${esc(s.phone.replace(/[^\d+]/g, ''))}">${esc(s.phone)}</a>` : '<span class="muted">—</span>'}</dd>
         ${s.postcode ? `<dt>Postcode</dt><dd>${esc(s.postcode)}</dd>` : ''}
+        ${s.preferred_location ? `<dt>Location</dt><dd>${esc(s.preferred_location)}</dd>` : ''}
         ${s.event_title ? `<dt>Event</dt><dd>${esc(s.event_title)}</dd>` : ''}
         <dt>Subject</dt><dd>${esc(s.subject || '—')}</dd>
         <dt>Status</dt><dd>
@@ -384,14 +386,14 @@
 
   function downloadCsv(rows, label) {
     if (!rows.length) { toast('Nothing to download', true); return; }
-    const header = ['Date', 'Time', 'Form', 'Name', 'Email', 'Phone', 'Postcode', 'Subject', 'Event', 'Message', 'Status'];
+    const header = ['Date', 'Time', 'Form', 'Name', 'Email', 'Phone', 'Postcode', 'Preferred location', 'Subject', 'Event', 'Message', 'Status'];
     const lines = rows.map(s => {
       const d = new Date(s.created_at);
       return [
         d.toLocaleDateString('en-GB'),
         d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }),
         formLabel(s.form),
-        s.name, s.email, s.phone, s.postcode, s.subject, s.event_title, s.message, s.status
+        s.name, s.email, s.phone, s.postcode, s.preferred_location, s.subject, s.event_title, s.message, s.status
       ].map(csvCell).join(',');
     });
     const csv = '﻿' + [header.join(','), ...lines].join('\r\n'); // BOM so Excel reads emojis/accents
@@ -494,6 +496,9 @@
     const tickets = form.booking_mode.value === 'tickets';
     // Always visible, so a link can be added early while the event is still on waitlist
     form.booking_url.required = tickets;
+    const waitlist = form.booking_mode.value === 'waitlist';
+    $('#waitlistOptionsField').classList.toggle('hidden', !waitlist);
+    $('#waitlistOptionsHint').classList.toggle('hidden', !waitlist);
     $('#bookingUrlLabel').textContent = tickets
       ? 'Ticket link for this event *'
       : 'Ticket link for this event (used once you switch to “Tickets on sale”)';
@@ -631,6 +636,7 @@
     form.published.checked = !!ev.published;
     form.featured.checked = !!ev.featured;
     form.badges.value = (ev.badges || []).join('\n');
+    form.waitlist_options.value = (ev.waitlist_options || []).join('\n');
     IMAGE_PICKERS.forEach(picker => { $(picker.status).textContent = ''; updatePreview(picker, ev[picker.field]); });
     openDrawer('eventDrawer');
     form.title.focus();
@@ -650,6 +656,7 @@
     record.published = form.published.checked;
     record.featured = form.featured.checked;
     record.badges = form.badges.value.split('\n').map(s => s.trim()).filter(Boolean);
+    record.waitlist_options = form.waitlist_options.value.split('\n').map(s => s.trim()).filter(Boolean).slice(0, 30);
     record.updated_at = new Date().toISOString();
 
     btn.disabled = true;
