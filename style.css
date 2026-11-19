@@ -310,9 +310,9 @@ section[id] { scroll-margin-top: calc(var(--header-h) - 1px); }
 }
 
 .hero-sticker {
-  position: absolute;
-  top: -0.5rem;
-  right: var(--gutter);
+  /* sits on its own row above the headline so it can never cover it */
+  align-self: flex-end;
+  margin-bottom: calc(-1 * clamp(1rem, 3vh, 2.5rem));
   background: var(--marigold);
   color: var(--ink);
   font-family: var(--font-display);
@@ -333,7 +333,6 @@ section[id] { scroll-margin-top: calc(var(--header-h) - 1px); }
   line-height: 0.86;
   letter-spacing: -0.03em;
   text-transform: uppercase;
-  margin-top: clamp(1rem, 4vh, 3rem);
   transform: translateY(var(--hero-shift, 0px));
   opacity: var(--hero-fade, 1);
   will-change: font-stretch, transform;
@@ -1007,7 +1006,7 @@ a.detail-value:hover { background-size: 100% 2px; }
   .header-logo { height: 28px; }
   .brand-tagline { font-size: 0.58rem; letter-spacing: 0.18em; }
   .hero-title { font-size: clamp(2.4rem, 13.5vw, 4.5rem); }
-  .hero-sticker { position: static; align-self: flex-start; transform: rotate(-3deg); }
+  .hero-sticker { align-self: flex-start; transform: rotate(-3deg); }
   .hero-foot { flex-direction: column; align-items: stretch; }
   .next-up { max-width: none; }
   .about-pillars { grid-template-columns: 1fr; }
