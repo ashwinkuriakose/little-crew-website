@@ -221,18 +221,9 @@ input[type="date"] { color-scheme: dark; }
 .image-controls .field { width: 100%; margin-bottom: 0; }
 .file-btn { cursor: pointer; }
 .banner-picker { display: flex; flex-direction: column; gap: 0.9rem; }
-.banner-preview { width: 100%; height: auto; aspect-ratio: 16 / 9; position: relative; }
-.banner-preview::after {
-  /* shows where the website text sits on computers */
-  content: 'Text area';
-  position: absolute; inset: 0 60% 0 0;
-  border-right: 1px dashed rgba(245, 158, 11, 0.8);
-  background: linear-gradient(90deg, rgba(11, 7, 20, 0.55), rgba(11, 7, 20, 0.15));
-  color: #fcd34d; font-size: 0.72rem; font-weight: 600;
-  display: flex; align-items: flex-end; padding: 0.5rem;
-  pointer-events: none;
-}
-.banner-preview:has(> span)::after { display: none; }
+.banner-picker { flex-direction: row; align-items: flex-start; }
+.banner-preview { width: 180px; height: 240px; flex-shrink: 0; text-align: center; padding: 0.5rem; font-size: 0.8rem; }
+@media (max-width: 860px) { .banner-picker { flex-direction: column; } }
 .row-actions { display: flex; gap: 0.5rem; flex-wrap: wrap; }
 .size-guide { font-size: 0.82rem; color: var(--muted); background: var(--bg); border: 1px solid var(--border); border-radius: 10px; padding: 0.75rem 0.9rem; width: 100%; }
 .size-guide strong { color: var(--text); }

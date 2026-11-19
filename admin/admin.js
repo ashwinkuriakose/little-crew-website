@@ -588,8 +588,8 @@
         const prefix = picker.justUploaded ? 'Uploaded ✓ (remember to save the event) · ' : '';
         picker.justUploaded = false;
         const notes = [];
-        if (Math.abs(ratio - 16 / 9) > 0.12) notes.push('not 16:9, so it will be cropped');
-        if (w < 1600) notes.push('a bit small, so it may look blurry on big screens');
+        if (Math.abs(ratio - 3 / 4) > 0.06) notes.push('not 3:4 portrait, so it will be cropped');
+        if (w < 900) notes.push('a bit small, so it may look blurry');
         status.textContent = prefix + `${w} × ${h} px` + (notes.length ? ` — ${notes.join('; ')}.` : ' ✓ good size');
         status.classList.toggle('warn', notes.length > 0);
       }, { once: true });

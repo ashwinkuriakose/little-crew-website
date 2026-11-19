@@ -10,7 +10,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="admin.css?v=2">
+  <link rel="stylesheet" href="admin.css?v=3">
 </head>
 
 <body>
@@ -227,11 +227,11 @@
               <label class="field"><span>…or image link</span><input name="banner_image_url" placeholder="https://…"></label>
               <p class="hint" id="bannerImageStatus"></p>
               <div class="size-guide">
-                <strong>Best size: 1920 × 1080 px</strong> (landscape 16:9), JPG or WebP, under 500 KB.
+                <strong>Best size: 1080 × 1440 px</strong> (portrait 3:4), JPG or WebP, under 500 KB.
                 <ul>
-                  <li>On computers the image fills the whole banner and the event text sits over the <em>left side</em> — keep faces, names and logos in the right 60%.</li>
-                  <li>On phones the full image shows above the text, so nothing gets cut off.</li>
-                  <li>Don't put the event name or date in the left 40% — it would sit under the website text.</li>
+                  <li>It shows as a big card next to the event text on computers, and full width on phones.</li>
+                  <li>The whole image is always shown — nothing is cropped — so you can put the artist, date and venue right on the ad.</li>
+                  <li>Keep text at least 60 px from the edges, as the corners are rounded.</li>
                 </ul>
               </div>
             </div>
@@ -301,7 +301,7 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
   <script src="../cms-config.js?v=1"></script>
-  <script src="admin.js?v=3"></script>
+  <script src="admin.js?v=4"></script>
 </body>
 
 </html>

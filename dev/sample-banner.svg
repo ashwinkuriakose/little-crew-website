@@ -1,18 +1,20 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1080" viewBox="0 0 1920 1080">
-  <!-- Demo-only sample of a 1920x1080 banner ad: artwork kept in the right 60% -->
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1440" viewBox="0 0 1080 1440">
+  <!-- Demo-only sample of a 1080x1440 (3:4) banner ad -->
   <defs>
-    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#3b0a45"/><stop offset="0.55" stop-color="#8a1c5c"/><stop offset="1" stop-color="#ffb300"/>
+    <linearGradient id="bg" x1="0" y1="0" x2="0.4" y2="1">
+      <stop offset="0" stop-color="#3b0a45"/><stop offset="0.6" stop-color="#8a1c5c"/><stop offset="1" stop-color="#ffb300"/>
     </linearGradient>
-    <radialGradient id="spot" cx="0.72" cy="0.4" r="0.45">
-      <stop offset="0" stop-color="#fff" stop-opacity="0.45"/><stop offset="1" stop-color="#fff" stop-opacity="0"/>
+    <radialGradient id="spot" cx="0.5" cy="0.38" r="0.5">
+      <stop offset="0" stop-color="#fff" stop-opacity="0.4"/><stop offset="1" stop-color="#fff" stop-opacity="0"/>
     </radialGradient>
   </defs>
-  <rect width="1920" height="1080" fill="url(#bg)"/>
-  <rect width="1920" height="1080" fill="url(#spot)"/>
-  <circle cx="1420" cy="520" r="300" fill="none" stroke="#fff" stroke-opacity="0.35" stroke-width="6"/>
-  <circle cx="1420" cy="520" r="210" fill="#1b0a2a" fill-opacity="0.35"/>
-  <text x="1420" y="500" text-anchor="middle" font-family="Arial Black, Arial" font-weight="900" font-size="120" fill="#fff">LIVE</text>
-  <text x="1420" y="610" text-anchor="middle" font-family="Arial" font-weight="700" font-size="54" fill="#ffd166">NEW YEAR 2027</text>
-  <text x="1420" y="900" text-anchor="middle" font-family="Arial" font-size="34" fill="#fff" fill-opacity="0.8">Sample banner ad · 1920 × 1080</text>
+  <rect width="1080" height="1440" fill="url(#bg)"/>
+  <rect width="1080" height="1440" fill="url(#spot)"/>
+  <text x="540" y="200" text-anchor="middle" font-family="Arial" font-weight="700" font-size="44" fill="#ffd166">LITTLE CREW PRESENTS</text>
+  <circle cx="540" cy="580" r="270" fill="none" stroke="#fff" stroke-opacity="0.35" stroke-width="6"/>
+  <circle cx="540" cy="580" r="190" fill="#1b0a2a" fill-opacity="0.35"/>
+  <text x="540" y="610" text-anchor="middle" font-family="Arial Black, Arial" font-weight="900" font-size="110" fill="#fff">LIVE</text>
+  <text x="540" y="1000" text-anchor="middle" font-family="Arial Black, Arial" font-weight="900" font-size="92" fill="#fff">NEW YEAR 2027</text>
+  <text x="540" y="1090" text-anchor="middle" font-family="Arial" font-size="46" fill="#fff">03 JAN · Maidstone</text>
+  <text x="540" y="1340" text-anchor="middle" font-family="Arial" font-size="30" fill="#fff" fill-opacity="0.75">Sample banner ad · 1080 × 1440</text>
 </svg>

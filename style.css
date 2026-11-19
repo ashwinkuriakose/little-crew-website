@@ -522,25 +522,15 @@ section[id] { scroll-margin-top: calc(var(--header-h) - 1px); }
 }
 .hero-slide.is-active .slide-poster img { transform: scale(1); }
 
-/* Event slide with its own wide banner ad image (1920 x 1080) */
-.slide-banner-bg {
-  position: absolute;
-  inset: calc(-1 * (var(--header-h) + 8vh)) 0 0 0;
-  z-index: -2;
-  background-size: cover;
-  background-position: center right;
-  transform: scale(1.06);
-  transition: transform 7s linear;
+/* Event slide with its own portrait ad image (1080 x 1440, 3:4) */
+.slide-poster.slide-ad {
+  aspect-ratio: 3 / 4;
+  /* as big as possible while the whole ad still fits on screen */
+  width: min(100%, 470px, calc((100svh - var(--header-h) - 11rem) * 0.75));
+  transform: none;
+  border-radius: 20px;
 }
-.hero-slide.is-active .slide-banner-bg { transform: scale(1); }
-.hero-slide-event.has-banner::before {
-  background:
-    linear-gradient(90deg, rgba(27, 10, 42, 0.94) 0%, rgba(27, 10, 42, 0.8) 28%, rgba(27, 10, 42, 0.2) 58%, transparent 75%),
-    linear-gradient(0deg, var(--ink), transparent 30%);
-}
-.has-banner .slide-event-inner { grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr); }
-.has-banner .slide-title { font-size: clamp(2.6rem, 5.6vw, 5.75rem); }
-.slide-banner-img { display: none; }
+.slide-poster.slide-ad:hover { transform: scale(1.01); }
 
 /* Copy steps in when its slide becomes active */
 .hero-slide-event .slide-copy > *,
@@ -1210,19 +1200,7 @@ a.detail-value:hover { background-size: 100% 2px; }
   .slide-event-inner { grid-template-columns: 1fr; align-content: start; gap: 1.5rem; }
   .slide-poster { order: -1; justify-self: start; width: min(58vw, 280px); transform: rotate(-2deg); }
   .hero-slide-event::before { background: linear-gradient(0deg, var(--ink) 30%, rgba(27, 10, 42, 0.55)); }
-  .has-banner .slide-banner-bg { display: none; }
-  .hero-slide-event.has-banner::before { background: none; }
-  .has-banner .slide-event-inner { grid-template-columns: 1fr; }
-  .slide-banner-img {
-    display: block;
-    order: -1;
-    width: 100%;
-    aspect-ratio: 16 / 9;
-    object-fit: cover;
-    border-radius: 18px;
-    box-shadow: 0 24px 50px -24px rgba(0, 0, 0, 0.8);
-    cursor: pointer;
-  }
+  .slide-poster.slide-ad { width: min(100%, 440px); justify-self: center; transform: none; }
   .desktop-nav { display: none; }
   .hamburger-menu { display: block; }
   .services-layout, .contact-grid, .about-grid { grid-template-columns: 1fr; }
@@ -1243,7 +1221,13 @@ a.detail-value:hover { background-size: 100% 2px; }
   .brand-tagline { font-size: 0.58rem; letter-spacing: 0.18em; }
   .hero-title { font-size: clamp(2.4rem, 13.5vw, 4.5rem); }
   .slide-title { font-size: clamp(2.3rem, 12vw, 4rem); }
-  .slide-poster { width: min(44vw, 200px); }
+  /* Phones: the ad image (or poster) fills the width; it already carries the details,
+     so only the title and button sit under it */
+  .slide-poster, .slide-poster.slide-ad { width: 100%; justify-self: stretch; transform: none; }
+  .hero-slide-event .slide-kicker, .hero-slide-event .slide-tagline, .hero-slide-event .slide-meta { display: none; }
+  .hero-slide-event .slide-title { font-size: clamp(2rem, 9vw, 3rem); }
+  .hero-slide-event .slide-actions { margin-top: 1rem; }
+  .slide-event-inner { gap: 1.1rem; }
   .slide-summary { display: none; }
   .slide-kicker { margin-bottom: 0.9rem; }
   .slide-actions .btn { flex: 1 1 auto; }

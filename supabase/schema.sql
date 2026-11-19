@@ -59,7 +59,7 @@ create table if not exists public.events (
   tagline text,
   summary text,
   image_url text,
-  banner_image_url text,   -- optional wide ad image for the top banner slider (1920x1080)
+  banner_image_url text,   -- optional portrait ad image for the top banner slider (1080x1440)
   date_day text,
   date_month text,
   date_year text,
